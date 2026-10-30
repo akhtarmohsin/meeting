@@ -14,7 +14,8 @@
 			</TextInput>
 		</div>
 
-		<div v-if="meetings.loading && !meetings.data" class="text-base text-ink-gray-5">Loading…</div>
+		<div v-if="meetings.error" class="text-base text-ink-red-4">{{ errorMessage(meetings.error) }}</div>
+		<div v-else-if="meetings.loading && !meetings.data" class="text-base text-ink-gray-5">Loading…</div>
 		<EmptyState
 			v-else-if="!meetings.data?.length"
 			icon="calendar"
@@ -41,7 +42,7 @@ import { computed, ref, watch } from "vue"
 import { Button, FeatherIcon, TabButtons, TextInput, createResource, debounce } from "frappe-ui"
 import EmptyState from "@/components/EmptyState.vue"
 import MeetingRow from "@/components/MeetingRow.vue"
-import { groupByDay } from "@/utils"
+import { errorMessage, groupByDay } from "@/utils"
 
 const views = [
 	{ label: "Upcoming", value: "upcoming" },

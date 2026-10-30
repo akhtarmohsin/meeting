@@ -28,7 +28,8 @@
 
 		<section>
 			<h3 class="mb-3 text-base font-semibold text-ink-gray-9">Today</h3>
-			<div v-if="dashboard.loading && !data" class="text-base text-ink-gray-5">Loading…</div>
+			<div v-if="dashboard.error" class="text-base text-ink-red-4">{{ errorMessage(dashboard.error) }}</div>
+			<div v-else-if="dashboard.loading && !data" class="text-base text-ink-gray-5">Loading…</div>
 			<EmptyState
 				v-else-if="!data?.today.length"
 				icon="sun"
@@ -64,7 +65,7 @@ import EmptyState from "@/components/EmptyState.vue"
 import MeetingRow from "@/components/MeetingRow.vue"
 import StatCard from "@/components/StatCard.vue"
 import { session } from "@/data/session"
-import { formatDate, groupByDay } from "@/utils"
+import { errorMessage, formatDate, groupByDay } from "@/utils"
 
 const dashboard = createResource({ url: "meeting.api.meetings.get_dashboard", auto: true })
 const data = computed(() => dashboard.data)

@@ -7,6 +7,9 @@ def get_context(context):
 	if frappe.session.user == "Guest":
 		frappe.local.flags.redirect_location = "/login?redirect-to=" + frappe.request.path
 		raise frappe.Redirect
+	# The SPA sends this back on every POST; without it Frappe rejects calls with a 400.
+	context.csrf_token = frappe.sessions.get_csrf_token()
+	frappe.db.commit()  # persist the token on the session before the page is served
 	context.boot = get_boot()
 
 

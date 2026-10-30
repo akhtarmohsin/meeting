@@ -11,7 +11,8 @@
 			<TabButtons v-model="scope" :buttons="scopes" />
 			<FormControl v-model="status" type="select" :options="statuses" class="w-40 sm:ml-auto" />
 		</div>
-		<div v-if="items.loading && !items.data" class="text-base text-ink-gray-5">Loading…</div>
+		<div v-if="items.error" class="text-base text-ink-red-4">{{ errorMessage(items.error) }}</div>
+		<div v-else-if="items.loading && !items.data" class="text-base text-ink-gray-5">Loading…</div>
 		<ActionItemList
 			v-else
 			ref="list"
@@ -27,6 +28,7 @@
 import { ref, watch } from "vue"
 import { Button, FeatherIcon, FormControl, TabButtons, createResource } from "frappe-ui"
 import ActionItemList from "@/components/ActionItemList.vue"
+import { errorMessage } from "@/utils"
 
 const scopes = [
 	{ label: "Assigned to me", value: "mine" },
