@@ -1,0 +1,263 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "format:MTG-{#####}",
+ "creation": "2026-10-31 12:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "status",
+  "column_break_hdr",
+  "organizer",
+  "meeting_type",
+  "schedule_section",
+  "start",
+  "column_break_sch",
+  "end",
+  "location_section",
+  "location",
+  "column_break_loc",
+  "video_provider",
+  "video_link",
+  "description",
+  "attendees_section",
+  "attendees",
+  "agenda_tab",
+  "agenda",
+  "minutes_tab",
+  "minutes",
+  "decisions",
+  "meta_section",
+  "invites_sent_on",
+  "reminder_sent"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "idx": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "default": "Scheduled",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "idx": 2,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Scheduled\nIn Progress\nCompleted\nCancelled"
+  },
+  {
+   "fieldname": "column_break_hdr",
+   "fieldtype": "Column Break",
+   "idx": 3
+  },
+  {
+   "fieldname": "organizer",
+   "fieldtype": "Link",
+   "idx": 4,
+   "in_standard_filter": 1,
+   "label": "Organizer",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "default": "Online",
+   "fieldname": "meeting_type",
+   "fieldtype": "Select",
+   "idx": 5,
+   "label": "Meeting Type",
+   "options": "Online\nIn Person\nHybrid"
+  },
+  {
+   "fieldname": "schedule_section",
+   "fieldtype": "Section Break",
+   "idx": 6,
+   "label": "Schedule"
+  },
+  {
+   "fieldname": "start",
+   "fieldtype": "Datetime",
+   "idx": 7,
+   "in_list_view": 1,
+   "label": "Start",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_sch",
+   "fieldtype": "Column Break",
+   "idx": 8
+  },
+  {
+   "fieldname": "end",
+   "fieldtype": "Datetime",
+   "idx": 9,
+   "label": "End",
+   "reqd": 1
+  },
+  {
+   "fieldname": "location_section",
+   "fieldtype": "Section Break",
+   "idx": 10,
+   "label": "Location"
+  },
+  {
+   "depends_on": "eval:doc.meeting_type!='Online'",
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "idx": 11,
+   "label": "Location"
+  },
+  {
+   "fieldname": "column_break_loc",
+   "fieldtype": "Column Break",
+   "idx": 12
+  },
+  {
+   "depends_on": "eval:doc.meeting_type!='In Person'",
+   "fieldname": "video_provider",
+   "fieldtype": "Select",
+   "idx": 13,
+   "label": "Video Provider",
+   "options": "\nGoogle Meet\nZoom\nMicrosoft Teams\nJitsi\nOther"
+  },
+  {
+   "depends_on": "eval:doc.meeting_type!='In Person'",
+   "fieldname": "video_link",
+   "fieldtype": "Data",
+   "idx": 14,
+   "label": "Video Link",
+   "options": "URL"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "idx": 15,
+   "label": "Description"
+  },
+  {
+   "fieldname": "attendees_section",
+   "fieldtype": "Section Break",
+   "idx": 16,
+   "label": "Attendees"
+  },
+  {
+   "fieldname": "attendees",
+   "fieldtype": "Table",
+   "idx": 17,
+   "label": "Attendees",
+   "options": "Meeting Attendee"
+  },
+  {
+   "fieldname": "agenda_tab",
+   "fieldtype": "Tab Break",
+   "idx": 18,
+   "label": "Agenda"
+  },
+  {
+   "fieldname": "agenda",
+   "fieldtype": "Table",
+   "idx": 19,
+   "label": "Agenda",
+   "options": "Meeting Agenda Item"
+  },
+  {
+   "fieldname": "minutes_tab",
+   "fieldtype": "Tab Break",
+   "idx": 20,
+   "label": "Minutes"
+  },
+  {
+   "fieldname": "minutes",
+   "fieldtype": "Text Editor",
+   "idx": 21,
+   "label": "Minutes"
+  },
+  {
+   "fieldname": "decisions",
+   "fieldtype": "Small Text",
+   "idx": 22,
+   "label": "Decisions"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "meta_section",
+   "fieldtype": "Section Break",
+   "idx": 23,
+   "label": "Notifications"
+  },
+  {
+   "fieldname": "invites_sent_on",
+   "fieldtype": "Datetime",
+   "idx": 24,
+   "label": "Invites Sent On",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "reminder_sent",
+   "fieldtype": "Check",
+   "idx": 25,
+   "label": "Reminder Sent",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-10-31 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Meeting",
+ "name": "Meeting",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Meeting Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Meeting User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "title,status,start",
+ "show_title_field_in_link": 1,
+ "sort_field": "start",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

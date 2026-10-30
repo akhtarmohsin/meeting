@@ -305,3 +305,33 @@ require_type_annotated_api_methods = True
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
+
+add_to_apps_screen = [
+	{
+		"name": "meeting",
+		"logo": "/assets/meeting/images/logo.svg",
+		"title": "Meeting",
+		"route": "/meeting",
+		"has_permission": "meeting.permissions.has_app_permission",
+	}
+]
+
+website_route_rules = [
+	{"from_route": "/meeting/<path:app_path>", "to_route": "meeting"},
+]
+
+permission_query_conditions = {
+	"Meeting": "meeting.permissions.meeting_query",
+	"Meeting Action Item": "meeting.permissions.action_item_query",
+}
+
+has_permission = {
+	"Meeting": "meeting.permissions.meeting_has_permission",
+	"Meeting Action Item": "meeting.permissions.action_item_has_permission",
+}
+
+scheduler_events = {
+	"cron": {
+		"*/10 * * * *": ["meeting.invites.send_upcoming_reminders"],
+	},
+}

@@ -1,0 +1,155 @@
+{
+ "actions": [],
+ "autoname": "format:MAI-{#####}",
+ "creation": "2026-10-31 12:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "meeting",
+  "column_break_1",
+  "status",
+  "priority",
+  "details_section",
+  "assigned_to",
+  "column_break_2",
+  "due_date",
+  "description",
+  "completed_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "idx": 1,
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "meeting",
+   "fieldtype": "Link",
+   "idx": 2,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Meeting",
+   "options": "Meeting"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break",
+   "idx": 3
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "idx": 4,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Open\nIn Progress\nDone\nCancelled"
+  },
+  {
+   "default": "Medium",
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "idx": 5,
+   "in_standard_filter": 1,
+   "label": "Priority",
+   "options": "Low\nMedium\nHigh"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "idx": 6
+  },
+  {
+   "fieldname": "assigned_to",
+   "fieldtype": "Link",
+   "idx": 7,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Assigned To",
+   "options": "User"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break",
+   "idx": 8
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "idx": 9,
+   "in_list_view": 1,
+   "label": "Due Date"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "idx": 10,
+   "label": "Description"
+  },
+  {
+   "fieldname": "completed_on",
+   "fieldtype": "Date",
+   "idx": 11,
+   "label": "Completed On",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-10-31 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Meeting",
+ "name": "Meeting Action Item",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Meeting Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Meeting User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "title,status,assigned_to",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

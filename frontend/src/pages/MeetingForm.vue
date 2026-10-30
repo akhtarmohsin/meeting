@@ -1,0 +1,171 @@
+<template>
+	<header class="page-header">
+		<h1 class="text-lg font-semibold text-ink-gray-9">{{ name ? "Edit meeting" : "New meeting" }}</h1>
+		<div class="flex gap-2">
+			<Button @click="router.back()">Cancel</Button>
+			<Button variant="solid" :loading="saving" @click="save">Save</Button>
+		</div>
+	</header>
+	<div v-if="loaded" class="page max-w-3xl space-y-6">
+		<FormControl v-model="form.title" label="Title" placeholder="Weekly product sync" autofocus />
+
+		<div class="grid gap-4 sm:grid-cols-2">
+			<FormControl v-model="start" type="datetime-local" label="Starts" />
+			<FormControl v-model="end" type="datetime-local" label="Ends" />
+		</div>
+		<div class="flex flex-wrap gap-2">
+			<Button v-for="d in durations" :key="d" size="sm" variant="subtle" @click="setDuration(d)">
+				{{ d }} min
+			</Button>
+		</div>
+
+		<div class="grid gap-4 sm:grid-cols-2">
+			<FormControl v-model="form.meeting_type" type="select" label="Type" :options="meetingTypes" />
+			<FormControl
+				v-if="form.meeting_type !== 'Online'"
+				v-model="form.location"
+				label="Location"
+				placeholder="Conference room A"
+			/>
+		</div>
+		<div v-if="form.meeting_type !== 'In Person'" class="grid gap-4 sm:grid-cols-3">
+			<FormControl v-model="form.video_provider" type="select" label="Video" :options="providers" />
+			<FormControl
+				v-model="form.video_link"
+				class="sm:col-span-2"
+				label="Meeting link"
+				placeholder="https://meet.google.com/..."
+			/>
+		</div>
+
+		<FormControl v-model="form.description" type="textarea" label="Description" :rows="3" />
+
+		<section>
+			<div class="mb-2 text-sm text-ink-gray-5">Attendees</div>
+			<UserPicker @select="addAttendee" />
+			<div class="mt-2 divide-y rounded-lg border" v-if="form.attendees.length">
+				<div v-for="(a, i) in form.attendees" :key="a.email" class="flex items-center gap-3 px-3 py-2">
+					<Avatar :label="a.full_name || a.email" size="sm" />
+					<div class="min-w-0 flex-1">
+						<div class="truncate text-base text-ink-gray-9">{{ a.full_name || a.email }}</div>
+						<div v-if="a.full_name" class="truncate text-sm text-ink-gray-5">{{ a.email }}</div>
+					</div>
+					<Badge v-if="a.user === form.organizer" label="Organizer" />
+					<label v-else class="flex items-center gap-1.5 text-sm text-ink-gray-6">
+						<input v-model="a.optional" type="checkbox" :true-value="1" :false-value="0" />
+						Optional
+					</label>
+					<Button
+						v-if="a.user !== form.organizer"
+						variant="ghost"
+						size="sm"
+						@click="form.attendees.splice(i, 1)"
+					>
+						<template #icon><FeatherIcon name="x" class="h-4 w-4" /></template>
+					</Button>
+				</div>
+			</div>
+		</section>
+
+		<AgendaEditor v-model="form.agenda" />
+
+		<label v-if="!name" class="flex items-center gap-2 text-base text-ink-gray-7">
+			<input v-model="sendInvites" type="checkbox" />
+			Email invites to attendees after saving
+		</label>
+		<ErrorMessage :message="error" />
+	</div>
+</template>
+
+<script setup>
+import { computed, reactive, ref } from "vue"
+import { useRouter } from "vue-router"
+import dayjs from "dayjs"
+import { Avatar, Badge, Button, ErrorMessage, FeatherIcon, FormControl, call, toast } from "frappe-ui"
+import AgendaEditor from "@/components/AgendaEditor.vue"
+import UserPicker from "@/components/UserPicker.vue"
+import { session } from "@/data/session"
+import { errorMessage, fromInputDatetime, toInputDatetime } from "@/utils"
+
+const props = defineProps({ name: String })
+const router = useRouter()
+
+const meetingTypes = ["Online", "In Person", "Hybrid"]
+const providers = ["", "Google Meet", "Zoom", "Microsoft Teams", "Jitsi", "Other"]
+const durations = [15, 30, 45, 60, 90]
+
+const form = reactive(blankMeeting())
+const loaded = ref(!props.name)
+const saving = ref(false)
+const sendInvites = ref(true)
+const error = ref("")
+
+if (props.name) loadMeeting()
+
+const start = computed({
+	get: () => toInputDatetime(form.start),
+	set: (v) => {
+		// Keep the meeting length when the start moves.
+		const length = dayjs(form.end).diff(dayjs(form.start), "minute") || 30
+		form.start = fromInputDatetime(v)
+		form.end = fromInputDatetime(dayjs(v).add(length, "minute"))
+	},
+})
+const end = computed({
+	get: () => toInputDatetime(form.end),
+	set: (v) => (form.end = fromInputDatetime(v)),
+})
+
+function setDuration(minutes) {
+	form.end = fromInputDatetime(dayjs(form.start).add(minutes, "minute"))
+}
+
+function addAttendee(person) {
+	if (form.attendees.some((a) => a.email === person.email)) return
+	form.attendees.push({ ...person, rsvp: "Pending", optional: 0 })
+}
+
+async function loadMeeting() {
+	const { doc } = await call("meeting.api.meetings.get_meeting", { name: props.name })
+	Object.assign(form, doc)
+	loaded.value = true
+}
+
+async function save() {
+	error.value = ""
+	saving.value = true
+	try {
+		const data = { ...form, agenda: form.agenda.filter((a) => a.topic?.trim()) }
+		const name = await call("meeting.api.meetings.save_meeting", { data, name: props.name })
+		if (!props.name && sendInvites.value) {
+			const sent = await call("meeting.api.meetings.send_invites", { name })
+			if (sent) toast({ title: `Invites sent to ${sent} attendee${sent > 1 ? "s" : ""}`, icon: "mail" })
+		}
+		router.replace({ name: "Meeting", params: { name } })
+	} catch (e) {
+		error.value = errorMessage(e)
+	} finally {
+		saving.value = false
+	}
+}
+
+function blankMeeting() {
+	const start = dayjs().add(30 - (dayjs().minute() % 30), "minute").second(0)
+	return {
+		title: "",
+		organizer: session.user,
+		status: "Scheduled",
+		meeting_type: "Online",
+		start: fromInputDatetime(start),
+		end: fromInputDatetime(start.add(30, "minute")),
+		location: "",
+		video_provider: "",
+		video_link: "",
+		description: "",
+		attendees: [
+			{ user: session.user, email: session.user, full_name: session.fullName, rsvp: "Accepted", optional: 0 },
+		],
+		agenda: [],
+	}
+}
+</script>
