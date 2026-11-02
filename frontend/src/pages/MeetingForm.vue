@@ -37,6 +37,13 @@
 				placeholder="https://meet.google.com/..."
 			/>
 		</div>
+		<div v-if="showMeetButton" class="-mt-3 flex items-center gap-3">
+			<Button :loading="generatingLink" @click="generateMeetLink">
+				<template #prefix><FeatherIcon name="video" class="h-4 w-4" /></template>
+				{{ form.meet_room ? "Generate new Frappe Meet link" : "Generate Frappe Meet link" }}
+			</Button>
+			<span v-if="form.meet_room" class="text-sm text-ink-gray-5">Room {{ form.meet_room }}</span>
+		</div>
 
 		<FormControl v-model="form.description" type="textarea" label="Description" :rows="3" />
 
@@ -91,12 +98,21 @@ const props = defineProps({ name: String })
 const router = useRouter()
 
 const meetingTypes = ["Online", "In Person", "Hybrid"]
-const providers = ["", "Google Meet", "Zoom", "Microsoft Teams", "Jitsi", "Other"]
+const providers = [
+	"",
+	...(session.frappeMeetAvailable ? ["Frappe Meet"] : []),
+	"Google Meet",
+	"Zoom",
+	"Microsoft Teams",
+	"Jitsi",
+	"Other",
+]
 const durations = [15, 30, 45, 60, 90]
 
 const form = reactive(blankMeeting())
 const loaded = ref(!props.name)
 const saving = ref(false)
+const generatingLink = ref(false)
 const sendInvites = ref(true)
 const error = ref("")
 
@@ -115,6 +131,24 @@ const end = computed({
 	get: () => toInputDatetime(form.end),
 	set: (v) => (form.end = fromInputDatetime(v)),
 })
+
+const showMeetButton = computed(
+	() => session.frappeMeetAvailable && form.meeting_type !== "In Person" && form.video_provider === "Frappe Meet",
+)
+
+async function generateMeetLink() {
+	if (form.video_link && !window.confirm("Replace the current link with a new Frappe Meet link?")) return
+	error.value = ""
+	generatingLink.value = true
+	try {
+		const room = await call("meeting.api.meetings.create_frappe_meet_link", { title: form.title || null })
+		Object.assign(form, room)
+	} catch (e) {
+		error.value = errorMessage(e)
+	} finally {
+		generatingLink.value = false
+	}
+}
 
 function setDuration(minutes) {
 	form.end = fromInputDatetime(dayjs(form.start).add(minutes, "minute"))
@@ -159,8 +193,9 @@ function blankMeeting() {
 		start: fromInputDatetime(start),
 		end: fromInputDatetime(start.add(30, "minute")),
 		location: "",
-		video_provider: "",
+		video_provider: session.frappeMeetAvailable ? "Frappe Meet" : "",
 		video_link: "",
+		meet_room: "",
 		description: "",
 		attendees: [
 			{ user: session.user, email: session.user, full_name: session.fullName, rsvp: "Accepted", optional: 0 },

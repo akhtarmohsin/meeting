@@ -7,6 +7,7 @@ from frappe.utils import add_to_date, now_datetime
 
 from meeting.api import meetings as api
 from meeting.invites import MeetingInvite
+from meeting.video import FrappeMeet
 
 ORGANIZER = "meeting-organizer@example.com"
 ATTENDEE = "meeting-attendee@example.com"
@@ -48,6 +49,19 @@ class TestMeeting(IntegrationTestCase):
 		frappe.set_user(OUTSIDER)
 		self.assertNotIn(doc.name, [m.name for m in api.get_meetings("all")])
 		self.assertRaises(frappe.PermissionError, api.get_meeting, doc.name)
+
+	def test_meet_room_cleared_when_provider_changes(self):
+		doc = make_meeting(video_provider="Frappe Meet", meet_room="abcd-efgh-ijkl")
+		self.assertEqual(doc.meet_room, "abcd-efgh-ijkl")
+
+		doc.video_provider = "Zoom"
+		doc.save()
+		self.assertFalse(doc.meet_room)
+
+	def test_frappe_meet_link_needs_suite(self):
+		if FrappeMeet.is_available():
+			self.skipTest("Frappe Suite is installed on this site")
+		self.assertRaises(frappe.ValidationError, api.create_frappe_meet_link, "Weekly sync")
 
 	def test_ics_contains_event(self):
 		doc = make_meeting(attendees=[{"user": ATTENDEE}], video_link="https://meet.example.com/x")

@@ -3,6 +3,7 @@ from frappe import _
 from frappe.utils import add_days, getdate, now_datetime, today
 
 from meeting.invites import MeetingInvite
+from meeting.video import FrappeMeet
 
 MEETING_LIST_FIELDS = [
 	"name",
@@ -27,6 +28,7 @@ EDITABLE_FIELDS = {
 	"location",
 	"video_provider",
 	"video_link",
+	"meet_room",
 	"description",
 	"attendees",
 	"agenda",
@@ -94,6 +96,12 @@ def send_invites(name: str, only_pending: bool = False) -> int:
 	doc = frappe.get_doc("Meeting", name)
 	doc.check_permission("write")
 	return MeetingInvite(doc).send(only_pending=only_pending)
+
+
+@frappe.whitelist()
+def create_frappe_meet_link(title: str | None = None) -> dict:
+	"""Create a Frappe Meet room; the caller stores the returned fields on the meeting."""
+	return FrappeMeet().create_room(title)
 
 
 @frappe.whitelist()

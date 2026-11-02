@@ -21,6 +21,8 @@
   "column_break_loc",
   "video_provider",
   "video_link",
+  "generate_meet_link",
+  "meet_room",
   "description",
   "attendees_section",
   "attendees",
@@ -125,7 +127,7 @@
    "fieldtype": "Select",
    "idx": 13,
    "label": "Video Provider",
-   "options": "\nGoogle Meet\nZoom\nMicrosoft Teams\nJitsi\nOther"
+   "options": "\nFrappe Meet\nGoogle Meet\nZoom\nMicrosoft Teams\nJitsi\nOther"
   },
   {
    "depends_on": "eval:doc.meeting_type!='In Person'",
@@ -136,66 +138,82 @@
    "options": "URL"
   },
   {
+   "depends_on": "eval:doc.meeting_type!='In Person' && doc.video_provider=='Frappe Meet'",
+   "fieldname": "generate_meet_link",
+   "fieldtype": "Button",
+   "idx": 15,
+   "label": "Generate Frappe Meet Link"
+  },
+  {
+   "depends_on": "eval:doc.meet_room",
+   "description": "Frappe Meet room created for this meeting",
+   "fieldname": "meet_room",
+   "fieldtype": "Data",
+   "idx": 16,
+   "label": "Meet Room",
+   "read_only": 1
+  },
+  {
    "fieldname": "description",
    "fieldtype": "Small Text",
-   "idx": 15,
+   "idx": 17,
    "label": "Description"
   },
   {
    "fieldname": "attendees_section",
    "fieldtype": "Section Break",
-   "idx": 16,
+   "idx": 18,
    "label": "Attendees"
   },
   {
    "fieldname": "attendees",
    "fieldtype": "Table",
-   "idx": 17,
+   "idx": 19,
    "label": "Attendees",
    "options": "Meeting Attendee"
   },
   {
    "fieldname": "agenda_tab",
    "fieldtype": "Tab Break",
-   "idx": 18,
+   "idx": 20,
    "label": "Agenda"
   },
   {
    "fieldname": "agenda",
    "fieldtype": "Table",
-   "idx": 19,
+   "idx": 21,
    "label": "Agenda",
    "options": "Meeting Agenda Item"
   },
   {
    "fieldname": "minutes_tab",
    "fieldtype": "Tab Break",
-   "idx": 20,
+   "idx": 22,
    "label": "Minutes"
   },
   {
    "fieldname": "minutes",
    "fieldtype": "Text Editor",
-   "idx": 21,
+   "idx": 23,
    "label": "Minutes"
   },
   {
    "fieldname": "decisions",
    "fieldtype": "Small Text",
-   "idx": 22,
+   "idx": 24,
    "label": "Decisions"
   },
   {
    "collapsible": 1,
    "fieldname": "meta_section",
    "fieldtype": "Section Break",
-   "idx": 23,
+   "idx": 25,
    "label": "Notifications"
   },
   {
    "fieldname": "invites_sent_on",
    "fieldtype": "Datetime",
-   "idx": 24,
+   "idx": 26,
    "label": "Invites Sent On",
    "read_only": 1
   },
@@ -203,13 +221,13 @@
    "default": "0",
    "fieldname": "reminder_sent",
    "fieldtype": "Check",
-   "idx": 25,
+   "idx": 27,
    "label": "Reminder Sent",
    "read_only": 1
   }
  ],
  "links": [],
- "modified": "2026-10-31 12:00:00.000000",
+ "modified": "2026-11-02 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Meeting",

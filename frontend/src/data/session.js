@@ -6,6 +6,7 @@ export const session = reactive({
 	fullName: "",
 	userImage: null,
 	isManager: false,
+	frappeMeetAvailable: false,
 
 	async init() {
 		// Production gets boot from the Jinja page; the Vite dev server has to ask for it.
@@ -21,6 +22,7 @@ export const session = reactive({
 		this.fullName = boot.full_name
 		this.userImage = boot.user_image
 		this.isManager = boot.is_manager
+		this.frappeMeetAvailable = boot.frappe_meet_available
 	},
 
 	async logout() {

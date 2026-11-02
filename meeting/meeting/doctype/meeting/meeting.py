@@ -6,11 +6,14 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import get_datetime
 
+from meeting.video import FRAPPE_MEET
+
 
 class Meeting(Document):
 	def validate(self):
 		self.organizer = self.organizer or frappe.session.user
 		self.validate_schedule()
+		self.clear_stale_meet_room()
 		self.set_attendee_details()
 		self.add_organizer_as_attendee()
 		self.remove_duplicate_attendees()
@@ -23,6 +26,10 @@ class Meeting(Document):
 	def validate_schedule(self):
 		if get_datetime(self.end) <= get_datetime(self.start):
 			frappe.throw(_("End time must be after start time"))
+
+	def clear_stale_meet_room(self):
+		if self.video_provider != FRAPPE_MEET or self.meeting_type == "In Person":
+			self.meet_room = None
 
 	def set_attendee_details(self):
 		for row in self.attendees:

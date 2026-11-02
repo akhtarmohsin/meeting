@@ -1,5 +1,7 @@
 import frappe
 
+from meeting.video import FrappeMeet
+
 no_cache = 1
 
 
@@ -29,4 +31,5 @@ def get_boot() -> dict:
 		is_manager=bool({"System Manager", "Meeting Manager"} & set(frappe.get_roles())),
 		site_name=frappe.local.site,
 		time_zone=frappe.utils.get_system_timezone(),
+		frappe_meet_available=FrappeMeet.is_available(),
 	)
