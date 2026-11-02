@@ -5,6 +5,8 @@ import frappe
 from frappe import _
 from frappe.utils import add_to_date, get_datetime, get_system_timezone, get_url, now_datetime
 
+from meeting.recurrence import repeat_message, to_ics_rrule
+
 
 class MeetingInvite:
 	"""Emails a meeting invite (with an .ics calendar file) to attendees."""
@@ -53,6 +55,8 @@ class MeetingInvite:
 			f"<p><b>{frappe.utils.escape_html(m.title)}</b></p>",
 			f"<p>{_('When')}: {start} ({get_system_timezone()})</p>",
 		]
+		if rule := self.repeat_rule():
+			lines.append(f"<p>{_('Repeats')}: {repeat_message(rule)}</p>")
 		if m.location:
 			lines.append(f"<p>{_('Where')}: {frappe.utils.escape_html(m.location)}</p>")
 		if m.video_link:
@@ -62,6 +66,11 @@ class MeetingInvite:
 			lines.append(f"<p>{_('Agenda')}:</p><ul>{items}</ul>")
 		lines.append(f'<p><a href="{self.url()}">{_("View and RSVP")}</a></p>')
 		return "\n".join(lines)
+
+	def repeat_rule(self) -> dict | None:
+		"""Only the first meeting's invite describes the series."""
+		m = self.meeting
+		return frappe.parse_json(m.repeat_rule) if m.repeat and not m.repeat_of and m.repeat_rule else None
 
 	def url(self) -> str:
 		return get_url(f"/meeting/meetings/{self.meeting.name}")
@@ -80,6 +89,7 @@ class MeetingInvite:
 			f"DTSTAMP:{to_ics_utc(now_datetime())}",
 			f"DTSTART:{to_ics_utc(m.start)}",
 			f"DTEND:{to_ics_utc(m.end)}",
+			*([f"RRULE:{to_ics_rrule(rule, to_ics_utc)}"] if (rule := self.repeat_rule()) else []),
 			f"SUMMARY:{ics_escape(m.title)}",
 			f"LOCATION:{ics_escape(location)}",
 			f"DESCRIPTION:{ics_escape(description)}",

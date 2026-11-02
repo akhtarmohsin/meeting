@@ -1,13 +1,16 @@
 # Copyright (c) 2026, Mohsin Akhtar and contributors
 # For license information, please see license.txt
 
+from datetime import timedelta
+
 import frappe
 from frappe.tests import IntegrationTestCase
-from frappe.utils import add_to_date, now_datetime
+from frappe.utils import add_months, add_to_date, get_datetime, now_datetime
 
 from meeting.api import meetings as api
 from meeting.frappe_calendar import FrappeCalendar, iso_duration
 from meeting.invites import MeetingInvite
+from meeting.recurrence import MeetingSeries
 from meeting.video import FrappeMeet
 
 ORGANIZER = "meeting-organizer@example.com"
@@ -75,6 +78,57 @@ class TestMeeting(IntegrationTestCase):
 		doc = make_meeting(add_to_calendar=1, insert=False)
 		self.assertRaises(frappe.ValidationError, doc.insert)
 
+	def test_weekly_series_creates_occurrences(self):
+		start = next_weekday(0, hour=10)  # a Monday, 10:00
+		rule = {"frequency": "weekly", "interval": 1, "byDay": [{"day": "mo"}, {"day": "we"}], "count": 4}
+		root = make_meeting(
+			start=start,
+			end=add_to_date(start, minutes=45),
+			repeat=1,
+			repeat_rule=rule,
+			attendees=[{"user": ATTENDEE}],
+			agenda=[{"topic": "Updates", "duration": 15}],
+			minutes="<p>Only for the first meeting</p>",
+		)
+		occurrences = series_of(root)
+
+		expected = [add_to_date(start, days=d) for d in (2, 7, 9)]  # Wed, next Mon, next Wed
+		self.assertEqual([get_datetime(o.start) for o in occurrences], expected)
+		for o in occurrences:
+			self.assertEqual(get_datetime(o.end) - get_datetime(o.start), timedelta(minutes=45))
+			self.assertEqual(o.title, root.title)
+			self.assertEqual(o.get_attendee(ATTENDEE).rsvp, "Pending")
+			self.assertEqual([a.topic for a in o.agenda], ["Updates"])
+			self.assertFalse(o.minutes)
+			self.assertFalse(o.repeat)
+
+	def test_series_ends_on_until_date(self):
+		start = next_weekday(0, hour=9)
+		until = add_to_date(start, days=3).strftime("%Y-%m-%dT23:59:59")
+		root = make_meeting(start=start, repeat=1, repeat_rule={"frequency": "daily", "interval": 1, "until": until})
+		self.assertEqual(len(series_of(root)), 3)
+
+	def test_open_ended_series_stops_at_horizon(self):
+		root = make_meeting(repeat=1, repeat_rule={"frequency": "weekly", "interval": 1})
+		last = get_datetime(series_of(root)[-1].start)
+		self.assertLessEqual(last, add_months(now_datetime(), MeetingSeries.HORIZON_MONTHS))
+		self.assertGreaterEqual(len(series_of(root)), 11)
+
+	def test_series_rule_cannot_change_and_delete_detaches(self):
+		root = make_meeting(repeat=1, repeat_rule={"frequency": "daily", "interval": 1, "count": 3})
+		api.save_meeting({"repeat_rule": {"frequency": "daily", "interval": 1, "count": 9}}, root.name)
+		self.assertEqual(frappe.parse_json(frappe.db.get_value("Meeting", root.name, "repeat_rule"))["count"], 3)
+
+		names = [o.name for o in series_of(root)]
+		frappe.delete_doc("Meeting", root.name)
+		for name in names:
+			self.assertIsNone(frappe.db.get_value("Meeting", name, "repeat_of"))
+
+	def test_series_invite_has_rrule(self):
+		root = make_meeting(repeat=1, repeat_rule={"frequency": "weekly", "interval": 2, "byDay": [{"day": "tu"}], "count": 5})
+		self.assertIn("RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=TU;COUNT=5", MeetingInvite(root).ics())
+		self.assertNotIn("RRULE", MeetingInvite(series_of(root)[0]).ics())
+
 	def test_ics_contains_event(self):
 		doc = make_meeting(attendees=[{"user": ATTENDEE}], video_link="https://meet.example.com/x")
 		ics = MeetingInvite(doc).ics()
@@ -105,3 +159,14 @@ def make_meeting(insert: bool = True, **kwargs):
 		}
 	)
 	return doc.insert() if insert else doc
+
+
+def next_weekday(weekday: int, hour: int):
+	"""The next given weekday (0 = Monday) at least a day away, at the given hour."""
+	day = add_to_date(now_datetime(), days=1).replace(hour=hour, minute=0, second=0, microsecond=0)
+	return add_to_date(day, days=(weekday - day.weekday()) % 7)
+
+
+def series_of(root):
+	names = frappe.get_all("Meeting", filters={"repeat_of": root.name}, order_by="start asc", pluck="name")
+	return [frappe.get_doc("Meeting", n) for n in names]

@@ -7,6 +7,7 @@ from frappe.model.document import Document
 from frappe.utils import get_datetime
 
 from meeting.frappe_calendar import FrappeCalendar
+from meeting.recurrence import MeetingSeries, parse_rule
 from meeting.video import FRAPPE_MEET
 
 # Changes to these fields are copied to the meeting's calendar event.
@@ -26,10 +27,15 @@ class Meeting(Document):
 	def validate(self):
 		self.organizer = self.organizer or frappe.session.user
 		self.validate_schedule()
+		self.validate_repeat()
 		self.clear_stale_meet_room()
 		self.set_attendee_details()
 		self.add_organizer_as_attendee()
 		self.remove_duplicate_attendees()
+
+	def after_insert(self):
+		if self.is_series_root():
+			MeetingSeries(self).create_upcoming()
 
 	def on_update(self):
 		if self.has_value_changed("start"):
@@ -39,6 +45,8 @@ class Meeting(Document):
 			FrappeCalendar().sync(self)
 
 	def on_trash(self):
+		if self.is_series_root():
+			MeetingSeries(self).detach_occurrences()
 		if self.calendar_event:
 			self.add_to_calendar = 0
 			FrappeCalendar().sync(self)
@@ -49,6 +57,18 @@ class Meeting(Document):
 		if not self.calendar_event:
 			return True
 		return any(self.has_value_changed(field) for field in CALENDAR_FIELDS)
+
+	def is_series_root(self) -> bool:
+		return bool(self.repeat and not self.repeat_of)
+
+	def validate_repeat(self):
+		if self.repeat_of:
+			# Occurrences follow the first meeting's rule; they don't carry one.
+			self.repeat, self.repeat_rule = 0, None
+		elif self.repeat:
+			parse_rule(self.repeat_rule)
+		else:
+			self.repeat_rule = None
 
 	def validate_schedule(self):
 		if get_datetime(self.end) <= get_datetime(self.start):

@@ -32,6 +32,9 @@
 					<a :href="doc.video_link" target="_blank" class="underline">{{ doc.video_provider || doc.video_link }}</a>
 				</InfoLine>
 				<InfoLine icon="user">Organized by {{ organizerName }}</InfoLine>
+				<InfoLine v-if="meeting.data.series" icon="repeat">
+					{{ meeting.data.series.message }} · meeting {{ meeting.data.series.index }} of {{ meeting.data.series.total }}
+				</InfoLine>
 				<InfoLine v-if="doc.invites_sent_on" icon="mail">Invites sent {{ formatDate(doc.invites_sent_on, "D MMM, h:mm A") }}</InfoLine>
 			</div>
 			<p v-if="doc.description" class="mt-4 whitespace-pre-line text-base text-ink-gray-7">{{ doc.description }}</p>

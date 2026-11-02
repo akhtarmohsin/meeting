@@ -72,3 +72,25 @@ export function errorMessage(error) {
 	const messages = error?.messages || []
 	return messages.length ? messages.join("\n") : error?.message || "Something went wrong"
 }
+
+const REPEAT_UNITS = { daily: "day", weekly: "week", monthly: "month", yearly: "year" }
+const DAY_NAMES = { mo: "Mon", tu: "Tue", we: "Wed", th: "Thu", fr: "Fri", sa: "Sat", su: "Sun" }
+const ORDINALS = { 1: "First", 2: "Second", 3: "Third", 4: "Fourth", 5: "Fifth", "-1": "Last" }
+
+// Worded like Frappe Calendar's repeat summary.
+export function repeatMessage(rule) {
+	const unit = REPEAT_UNITS[rule?.frequency]
+	if (!unit) return ""
+	const interval = rule.interval || 1
+	let message = interval === 1 ? `Every ${unit}` : `Every ${interval} ${unit}s`
+	if (rule.byDay?.length) {
+		const days = rule.byDay.map((d) => (d.nthOfPeriod ? `${ORDINALS[d.nthOfPeriod]} ${DAY_NAMES[d.day]}` : DAY_NAMES[d.day]))
+		message += ` on ${days.join(", ")}`
+	} else if (rule.byMonthDay?.length) {
+		const day = rule.byMonthDay[0]
+		message += day === -1 ? " on the last day" : ` on day ${day}`
+	}
+	if (rule.until) return `${message} until ${dayjs(rule.until.replace(/Z$/, "")).format("MMM DD, YYYY")}`
+	if (rule.count) return `${message}, ${rule.count} times`
+	return message
+}

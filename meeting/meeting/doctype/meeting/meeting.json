@@ -27,6 +27,11 @@
   "calendar_event",
   "calendar_account",
   "description",
+  "repeat_section",
+  "repeat",
+  "repeat_rule",
+  "column_break_repeat",
+  "repeat_of",
   "attendees_section",
   "attendees",
   "agenda_tab",
@@ -189,60 +194,102 @@
    "label": "Description"
   },
   {
-   "fieldname": "attendees_section",
+   "collapsible": 1,
+   "collapsible_depends_on": "eval:doc.repeat || doc.repeat_of",
+   "fieldname": "repeat_section",
    "fieldtype": "Section Break",
    "idx": 21,
+   "label": "Repeat"
+  },
+  {
+   "default": "0",
+   "description": "Creates the following occurrences as separate meetings when saved",
+   "fieldname": "repeat",
+   "fieldtype": "Check",
+   "idx": 22,
+   "label": "Repeat",
+   "set_only_once": 1
+  },
+  {
+   "depends_on": "eval:doc.repeat",
+   "description": "Same format as Frappe Calendar: frequency, interval, byDay, byMonthDay, until or count",
+   "fieldname": "repeat_rule",
+   "fieldtype": "JSON",
+   "idx": 23,
+   "label": "Repeat Rule",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "column_break_repeat",
+   "fieldtype": "Column Break",
+   "idx": 24
+  },
+  {
+   "description": "First meeting of the series this one belongs to",
+   "fieldname": "repeat_of",
+   "fieldtype": "Link",
+   "idx": 25,
+   "label": "Repeat Of",
+   "no_copy": 1,
+   "options": "Meeting",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "attendees_section",
+   "fieldtype": "Section Break",
+   "idx": 26,
    "label": "Attendees"
   },
   {
    "fieldname": "attendees",
    "fieldtype": "Table",
-   "idx": 22,
+   "idx": 27,
    "label": "Attendees",
    "options": "Meeting Attendee"
   },
   {
    "fieldname": "agenda_tab",
    "fieldtype": "Tab Break",
-   "idx": 23,
+   "idx": 28,
    "label": "Agenda"
   },
   {
    "fieldname": "agenda",
    "fieldtype": "Table",
-   "idx": 24,
+   "idx": 29,
    "label": "Agenda",
    "options": "Meeting Agenda Item"
   },
   {
    "fieldname": "minutes_tab",
    "fieldtype": "Tab Break",
-   "idx": 25,
+   "idx": 30,
    "label": "Minutes"
   },
   {
    "fieldname": "minutes",
    "fieldtype": "Text Editor",
-   "idx": 26,
+   "idx": 31,
    "label": "Minutes"
   },
   {
    "fieldname": "decisions",
    "fieldtype": "Small Text",
-   "idx": 27,
+   "idx": 32,
    "label": "Decisions"
   },
   {
    "collapsible": 1,
    "fieldname": "meta_section",
    "fieldtype": "Section Break",
-   "idx": 28,
+   "idx": 33,
    "label": "Notifications"
   },
   {
    "fieldname": "invites_sent_on",
    "fieldtype": "Datetime",
-   "idx": 29,
+   "idx": 34,
    "label": "Invites Sent On",
    "read_only": 1
   },
@@ -250,13 +297,13 @@
    "default": "0",
    "fieldname": "reminder_sent",
    "fieldtype": "Check",
-   "idx": 30,
+   "idx": 35,
    "label": "Reminder Sent",
    "read_only": 1
   }
  ],
  "links": [],
- "modified": "2026-11-03 12:00:00.000000",
+ "modified": "2026-11-03 13:00:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Meeting",

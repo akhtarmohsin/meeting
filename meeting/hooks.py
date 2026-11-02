@@ -334,4 +334,5 @@ scheduler_events = {
 	"cron": {
 		"*/10 * * * *": ["meeting.invites.send_upcoming_reminders"],
 	},
+	"daily": ["meeting.recurrence.extend_series"],
 }

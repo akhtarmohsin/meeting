@@ -13,6 +13,16 @@
 			<FormControl v-model="start" type="datetime-local" label="Starts" />
 			<FormControl v-model="end" type="datetime-local" label="Ends" />
 		</div>
+		<!-- Repeat is set when the meeting is created; later it only describes the series. -->
+		<div v-if="!name" class="-mt-2 flex items-center gap-3">
+			<Checkbox :model-value="Boolean(form.repeat)" :label="repeatLabel" @update:model-value="onRepeatToggle" />
+			<Button v-if="form.repeat" variant="ghost" size="sm" @click="repeatDialog = true">Edit</Button>
+		</div>
+		<div v-else-if="series" class="-mt-2 flex items-center gap-2 text-base text-ink-gray-7">
+			<FeatherIcon name="repeat" class="h-4 w-4 shrink-0 text-ink-gray-5" />
+			{{ series.message }} · meeting {{ series.index }} of {{ series.total }}
+		</div>
+		<RepeatDialog v-model="repeatDialog" :start="form.start" :value="form.repeat_rule" @update="setRepeatRule" />
 
 		<!-- Where the meeting happens on the left, the description beside it. -->
 		<div class="grid gap-8 md:grid-cols-2">
@@ -109,9 +119,10 @@ import { useRouter } from "vue-router"
 import dayjs from "dayjs"
 import { Avatar, Button, Checkbox, ErrorMessage, FeatherIcon, FormControl, Switch, call, toast } from "frappe-ui"
 import AgendaEditor from "@/components/AgendaEditor.vue"
+import RepeatDialog from "@/components/RepeatDialog.vue"
 import UserPicker from "@/components/UserPicker.vue"
 import { session } from "@/data/session"
-import { errorMessage, fromInputDatetime, toInputDatetime } from "@/utils"
+import { errorMessage, fromInputDatetime, repeatMessage, toInputDatetime } from "@/utils"
 
 const props = defineProps({ name: String })
 const router = useRouter()
@@ -131,6 +142,20 @@ const form = reactive(blankMeeting())
 const loaded = ref(!props.name)
 const saving = ref(false)
 const generatingLink = ref(false)
+const repeatDialog = ref(false)
+const series = ref(null)
+
+const repeatLabel = computed(() => (form.repeat ? repeatMessage(form.repeat_rule) : "Repeat"))
+
+function onRepeatToggle(on) {
+	if (on) repeatDialog.value = true
+	else setRepeatRule(null)
+}
+
+function setRepeatRule(rule) {
+	form.repeat = rule ? 1 : 0
+	form.repeat_rule = rule
+}
 const sendInvites = ref(true)
 const error = ref("")
 
@@ -174,8 +199,9 @@ function addAttendee(person) {
 }
 
 async function loadMeeting() {
-	const { doc } = await call("meeting.api.meetings.get_meeting", { name: props.name })
+	const { doc, series: info } = await call("meeting.api.meetings.get_meeting", { name: props.name })
 	Object.assign(form, doc)
+	series.value = info
 	loaded.value = true
 }
 
@@ -211,6 +237,8 @@ function blankMeeting() {
 		video_link: "",
 		meet_room: "",
 		add_to_calendar: 0,
+		repeat: 0,
+		repeat_rule: null,
 		description: "",
 		attendees: [
 			{ user: session.user, email: session.user, full_name: session.fullName, rsvp: "Accepted", optional: 0 },

@@ -3,6 +3,7 @@ from frappe import _
 from frappe.utils import add_days, getdate, now_datetime, today
 
 from meeting.invites import MeetingInvite
+from meeting.recurrence import repeat_message
 from meeting.video import FrappeMeet
 
 MEETING_LIST_FIELDS = [
@@ -30,6 +31,8 @@ EDITABLE_FIELDS = {
 	"video_link",
 	"meet_room",
 	"add_to_calendar",
+	"repeat",
+	"repeat_rule",
 	"description",
 	"attendees",
 	"agenda",
@@ -64,6 +67,7 @@ def get_meeting(name: str) -> dict:
 		"doc": doc.as_dict(),
 		"can_edit": doc.has_permission("write"),
 		"my_rsvp": me.rsvp if me else None,
+		"series": get_series(doc),
 		"action_items": frappe.get_list(
 			"Meeting Action Item",
 			filters={"meeting": name},
@@ -76,6 +80,10 @@ def get_meeting(name: str) -> dict:
 @frappe.whitelist()
 def save_meeting(data: dict, name: str | None = None) -> str:
 	values = {k: v for k, v in data.items() if k in EDITABLE_FIELDS}
+	if name:
+		# A series is set up when the first meeting is created and can't be reshaped after.
+		values.pop("repeat", None)
+		values.pop("repeat_rule", None)
 	doc = frappe.get_doc("Meeting", name) if name else frappe.new_doc("Meeting")
 	doc.update(values)
 	doc.save()
@@ -139,6 +147,21 @@ def search_users(txt: str = "") -> list[dict]:
 		limit=20,
 		order_by="full_name asc",
 	)
+
+
+def get_series(doc) -> dict | None:
+	root_name = doc.repeat_of or (doc.name if doc.repeat else None)
+	if not root_name:
+		return None
+	rule = frappe.parse_json(frappe.db.get_value("Meeting", root_name, "repeat_rule") or "{}")
+	starts = [root_name, *frappe.get_all("Meeting", filters={"repeat_of": root_name}, order_by="start asc", pluck="name")]
+	return {
+		"root": root_name,
+		"rule": rule,
+		"message": repeat_message(rule) if rule else "",
+		"index": starts.index(doc.name) + 1,
+		"total": len(starts),
+	}
 
 
 def get_meetings_between(start, end) -> list[dict]:
