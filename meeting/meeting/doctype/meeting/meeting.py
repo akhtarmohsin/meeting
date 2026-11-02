@@ -52,6 +52,8 @@ class Meeting(Document):
 			FrappeCalendar().sync(self)
 
 	def calendar_needs_sync(self) -> bool:
+		if self.flags.from_calendar:
+			return False
 		if not (self.add_to_calendar or self.calendar_event):
 			return False
 		if not self.calendar_event:

@@ -1,13 +1,15 @@
 # Copyright (c) 2026, Mohsin Akhtar and contributors
 # For license information, please see license.txt
 
-from datetime import timedelta
+from datetime import timedelta, timezone
+from zoneinfo import ZoneInfo
 
 import frappe
 from frappe.tests import IntegrationTestCase
-from frappe.utils import add_months, add_to_date, get_datetime, now_datetime
+from frappe.utils import add_months, add_to_date, get_datetime, get_system_timezone, now_datetime
 
 from meeting.api import meetings as api
+from meeting.calendar_sync import CalendarChanges, parse_duration
 from meeting.frappe_calendar import FrappeCalendar, iso_duration
 from meeting.invites import MeetingInvite
 from meeting.recurrence import MeetingSeries
@@ -129,6 +131,45 @@ class TestMeeting(IntegrationTestCase):
 		self.assertIn("RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=TU;COUNT=5", MeetingInvite(root).ics())
 		self.assertNotIn("RRULE", MeetingInvite(series_of(root)[0]).ics())
 
+	def test_calendar_changes_update_meeting(self):
+		doc = make_meeting(start=next_weekday(2, hour=11), attendees=[{"user": ATTENDEE}, {"email": "guest@example.org"}])
+		start = get_datetime(doc.start)
+		event = {
+			"title": "Renamed in Calendar",
+			# 1 hour later, written in UTC rather than the site's zone.
+			"start": to_utc_local(start + timedelta(hours=1)),
+			"time_zone": "UTC",
+			"duration": "PT1H30M",
+			"organizer": "owner@calendar.test",
+			"participants": [
+				{"email": "owner@calendar.test", "roles": {"owner": True}, "participation_status": "ACCEPTED"},
+				{"email": ATTENDEE, "roles": {"attendee": True}, "participation_status": "DECLINED"},
+				{"email": OUTSIDER, "_name": "New Person", "roles": {"attendee": True}, "participation_status": "TENTATIVE"},
+			],
+		}
+		CalendarChanges(doc).apply(event)
+		doc.reload()
+
+		self.assertEqual(doc.title, "Renamed in Calendar")
+		self.assertEqual(get_datetime(doc.start), start + timedelta(hours=1))
+		self.assertEqual(get_datetime(doc.end) - get_datetime(doc.start), timedelta(minutes=90))
+		self.assertEqual(doc.get_attendee(ATTENDEE).rsvp, "Declined")
+		self.assertEqual(doc.get_attendee(OUTSIDER).rsvp, "Tentative")
+		self.assertIsNone(doc.get_attendee("guest@example.org"))  # removed in the calendar
+		self.assertIsNone(doc.get_attendee("owner@calendar.test"))  # the calendar's organizer
+		self.assertIsNotNone(doc.get_attendee(ORGANIZER))
+
+	def test_deleted_calendar_event_unlinks_meeting(self):
+		doc = make_meeting()
+		doc.db_set({"add_to_calendar": 1, "calendar_event": "x", "calendar_account": "y"})
+		CalendarChanges(doc).apply(None)
+		doc.reload()
+		self.assertEqual((doc.add_to_calendar, doc.calendar_event), (0, None))
+
+	def test_parse_duration(self):
+		self.assertEqual(parse_duration("PT45M"), timedelta(minutes=45))
+		self.assertEqual(parse_duration("P1DT2H"), timedelta(days=1, hours=2))
+
 	def test_ics_contains_event(self):
 		doc = make_meeting(attendees=[{"user": ATTENDEE}], video_link="https://meet.example.com/x")
 		ics = MeetingInvite(doc).ics()
@@ -170,3 +211,9 @@ def next_weekday(weekday: int, hour: int):
 def series_of(root):
 	names = frappe.get_all("Meeting", filters={"repeat_of": root.name}, order_by="start asc", pluck="name")
 	return [frappe.get_doc("Meeting", n) for n in names]
+
+
+def to_utc_local(value) -> str:
+	"""A site-zone datetime written as a UTC local date-time, as a calendar in UTC would send it."""
+	local = value.replace(tzinfo=ZoneInfo(get_system_timezone()))
+	return local.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")

@@ -333,6 +333,7 @@ has_permission = {
 scheduler_events = {
 	"cron": {
 		"*/10 * * * *": ["meeting.invites.send_upcoming_reminders"],
+		"*/5 * * * *": ["meeting.calendar_sync.pull_calendar_changes"],
 	},
 	"daily": ["meeting.recurrence.extend_series"],
 }

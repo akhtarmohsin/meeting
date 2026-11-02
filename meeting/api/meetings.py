@@ -2,6 +2,7 @@ import frappe
 from frappe import _
 from frappe.utils import add_days, getdate, now_datetime, today
 
+from meeting.calendar_sync import CalendarChanges
 from meeting.invites import MeetingInvite
 from meeting.recurrence import repeat_message
 from meeting.video import FrappeMeet
@@ -62,6 +63,7 @@ def get_meetings(view: str = "upcoming", search: str | None = None, limit: int =
 def get_meeting(name: str) -> dict:
 	doc = frappe.get_doc("Meeting", name)
 	doc.check_permission("read")
+	refresh_from_calendar(doc)
 	me = doc.get_attendee(frappe.session.user)
 	return {
 		"doc": doc.as_dict(),
@@ -147,6 +149,18 @@ def search_users(txt: str = "") -> list[dict]:
 		limit=20,
 		order_by="full_name asc",
 	)
+
+
+def refresh_from_calendar(doc) -> None:
+	"""Show edits made in Frappe Calendar straight away; the scheduled pull catches the rest."""
+	if not doc.calendar_event:
+		return
+	try:
+		CalendarChanges.pull(doc)
+	except Exception:
+		# A calendar that can't be reached shouldn't stop the meeting from opening.
+		frappe.log_error(title=f"Meeting: calendar refresh failed for {doc.name}")
+	doc.reload()
 
 
 def get_series(doc) -> dict | None:

@@ -2,6 +2,10 @@ import frappe
 from frappe import _
 from frappe.utils import get_datetime, get_system_timezone, get_url, time_diff_in_seconds
 
+# Meeting RSVP <-> JMAP participationStatus.
+RSVP_TO_STATUS = {"Accepted": "accepted", "Declined": "declined", "Tentative": "tentative", "Pending": "needs-action"}
+STATUS_TO_RSVP = {status: rsvp for rsvp, status in RSVP_TO_STATUS.items()}
+
 
 class FrappeCalendar:
 	"""Keeps an event in the user's Frappe Calendar (part of Frappe Suite) in step with a meeting."""
@@ -49,7 +53,7 @@ class FrappeCalendar:
 				uid=current["uid"],
 				organizer=current.get("organizer"),
 				calendar_ids=[c["calendar_id"] for c in current.get("calendars", [])] or None,
-				**self.event(meeting),
+				**self.event(meeting, current),
 			)
 		else:
 			# New, or deleted from the calendar since: create it (again).
@@ -69,7 +73,7 @@ class FrappeCalendar:
 	def call(self, method: str, **kwargs):
 		return frappe.get_attr(f"{self.EVENT_API}.{method}")(**kwargs)
 
-	def event(self, meeting) -> dict:
+	def event(self, meeting, current: dict | None = None) -> dict:
 		return {
 			"title": meeting.title,
 			"start": get_datetime(meeting.start).strftime("%Y-%m-%dT%H:%M:%S"),
@@ -78,7 +82,29 @@ class FrappeCalendar:
 			"status": "Cancelled" if meeting.status == "Cancelled" else "Confirmed",
 			"description": self.description(meeting),
 			"locations": [{"name": meeting.location}] if meeting.location else None,
+			"participants": self.participants(meeting, current),
 		}
+
+	def participants(self, meeting, current: dict | None) -> list[dict] | None:
+		"""Attendees as calendar participants. No invites are asked for: the meeting app sends its own."""
+		previous = {p["email"].lower(): p for p in (current or {}).get("participants", []) if p.get("email")}
+		# Calendar's own organizer entry is kept as it is.
+		rows = [as_input(p) for p in previous.values() if is_calendar_organizer(p, current)]
+		for row in meeting.attendees:
+			if row.user == meeting.organizer or not row.email:
+				continue
+			email = row.email.lower()
+			rows.append(
+				{
+					"uid": previous.get(email, {}).get("uid"),
+					"email": email,
+					"name": row.full_name or email,
+					"roles": {"attendee": True},
+					"participation_status": RSVP_TO_STATUS.get(row.rsvp, "needs-action"),
+					"expect_reply": False,
+				}
+			)
+		return rows or None
 
 	def description(self, meeting) -> str:
 		parts = [meeting.description or ""]
@@ -86,6 +112,26 @@ class FrappeCalendar:
 			parts.append(_("Join: {0}").format(meeting.video_link))
 		parts.append(_("Agenda and minutes: {0}").format(get_url(f"/meeting/meetings/{meeting.name}")))
 		return "\n\n".join(p for p in parts if p).strip()
+
+
+def is_calendar_organizer(participant: dict, event: dict | None) -> bool:
+	roles = participant.get("roles") or {}
+	return bool(roles.get("owner") or roles.get("chair")) or (
+		participant.get("email", "").lower() == (event or {}).get("organizer", "").lower()
+	)
+
+
+def as_input(participant: dict) -> dict:
+	"""A participant as Suite returns it, in the shape Suite accepts back."""
+	return {
+		"uid": participant.get("uid"),
+		"email": participant["email"],
+		"name": participant.get("_name") or participant["email"],
+		"roles": participant.get("roles") or None,
+		"participation_status": (participant.get("participation_status") or "").lower() or None,
+		"expect_reply": bool(participant.get("expect_reply")),
+		"kind": participant.get("kind") or None,
+	}
 
 
 def iso_duration(seconds: float) -> str:
