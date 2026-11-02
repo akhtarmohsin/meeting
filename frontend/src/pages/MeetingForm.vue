@@ -13,11 +13,6 @@
 			<FormControl v-model="start" type="datetime-local" label="Starts" />
 			<FormControl v-model="end" type="datetime-local" label="Ends" />
 		</div>
-		<div class="flex flex-wrap gap-2">
-			<Button v-for="d in durations" :key="d" size="sm" variant="subtle" @click="setDuration(d)">
-				{{ d }} min
-			</Button>
-		</div>
 
 		<div class="grid gap-4 sm:grid-cols-2">
 			<FormControl v-model="form.meeting_type" type="select" label="Type" :options="meetingTypes" />
@@ -107,7 +102,6 @@ const providers = [
 	"Jitsi",
 	"Other",
 ]
-const durations = [15, 30, 45, 60, 90]
 
 const form = reactive(blankMeeting())
 const loaded = ref(!props.name)
@@ -148,10 +142,6 @@ async function generateMeetLink() {
 	} finally {
 		generatingLink.value = false
 	}
-}
-
-function setDuration(minutes) {
-	form.end = fromInputDatetime(dayjs(form.start).add(minutes, "minute"))
 }
 
 function addAttendee(person) {
