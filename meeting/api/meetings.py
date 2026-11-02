@@ -29,6 +29,7 @@ EDITABLE_FIELDS = {
 	"video_provider",
 	"video_link",
 	"meet_room",
+	"add_to_calendar",
 	"description",
 	"attendees",
 	"agenda",

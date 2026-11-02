@@ -23,6 +23,9 @@
   "video_link",
   "generate_meet_link",
   "meet_room",
+  "add_to_calendar",
+  "calendar_event",
+  "calendar_account",
   "description",
   "attendees_section",
   "attendees",
@@ -154,66 +157,92 @@
    "read_only": 1
   },
   {
+   "default": "0",
+   "description": "Keep an event for this meeting in your Frappe Calendar (needs Frappe Suite Calendar)",
+   "fieldname": "add_to_calendar",
+   "fieldtype": "Check",
+   "idx": 17,
+   "label": "Add to Frappe Calendar"
+  },
+  {
+   "fieldname": "calendar_event",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "idx": 18,
+   "label": "Calendar Event",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "calendar_account",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "idx": 19,
+   "label": "Calendar Account",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
    "fieldname": "description",
    "fieldtype": "Small Text",
-   "idx": 17,
+   "idx": 20,
    "label": "Description"
   },
   {
    "fieldname": "attendees_section",
    "fieldtype": "Section Break",
-   "idx": 18,
+   "idx": 21,
    "label": "Attendees"
   },
   {
    "fieldname": "attendees",
    "fieldtype": "Table",
-   "idx": 19,
+   "idx": 22,
    "label": "Attendees",
    "options": "Meeting Attendee"
   },
   {
    "fieldname": "agenda_tab",
    "fieldtype": "Tab Break",
-   "idx": 20,
+   "idx": 23,
    "label": "Agenda"
   },
   {
    "fieldname": "agenda",
    "fieldtype": "Table",
-   "idx": 21,
+   "idx": 24,
    "label": "Agenda",
    "options": "Meeting Agenda Item"
   },
   {
    "fieldname": "minutes_tab",
    "fieldtype": "Tab Break",
-   "idx": 22,
+   "idx": 25,
    "label": "Minutes"
   },
   {
    "fieldname": "minutes",
    "fieldtype": "Text Editor",
-   "idx": 23,
+   "idx": 26,
    "label": "Minutes"
   },
   {
    "fieldname": "decisions",
    "fieldtype": "Small Text",
-   "idx": 24,
+   "idx": 27,
    "label": "Decisions"
   },
   {
    "collapsible": 1,
    "fieldname": "meta_section",
    "fieldtype": "Section Break",
-   "idx": 25,
+   "idx": 28,
    "label": "Notifications"
   },
   {
    "fieldname": "invites_sent_on",
    "fieldtype": "Datetime",
-   "idx": 26,
+   "idx": 29,
    "label": "Invites Sent On",
    "read_only": 1
   },
@@ -221,13 +250,13 @@
    "default": "0",
    "fieldname": "reminder_sent",
    "fieldtype": "Check",
-   "idx": 27,
+   "idx": 30,
    "label": "Reminder Sent",
    "read_only": 1
   }
  ],
  "links": [],
- "modified": "2026-11-02 12:00:00.000000",
+ "modified": "2026-11-03 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Meeting",

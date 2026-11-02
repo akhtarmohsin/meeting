@@ -6,7 +6,20 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import get_datetime
 
+from meeting.frappe_calendar import FrappeCalendar
 from meeting.video import FRAPPE_MEET
+
+# Changes to these fields are copied to the meeting's calendar event.
+CALENDAR_FIELDS = (
+	"add_to_calendar",
+	"title",
+	"start",
+	"end",
+	"status",
+	"description",
+	"location",
+	"video_link",
+)
 
 
 class Meeting(Document):
@@ -22,6 +35,20 @@ class Meeting(Document):
 		if self.has_value_changed("start"):
 			# Rescheduled meetings need a fresh reminder.
 			self.db_set("reminder_sent", 0)
+		if self.calendar_needs_sync():
+			FrappeCalendar().sync(self)
+
+	def on_trash(self):
+		if self.calendar_event:
+			self.add_to_calendar = 0
+			FrappeCalendar().sync(self)
+
+	def calendar_needs_sync(self) -> bool:
+		if not (self.add_to_calendar or self.calendar_event):
+			return False
+		if not self.calendar_event:
+			return True
+		return any(self.has_value_changed(field) for field in CALENDAR_FIELDS)
 
 	def validate_schedule(self):
 		if get_datetime(self.end) <= get_datetime(self.start):

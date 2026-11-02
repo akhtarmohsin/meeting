@@ -6,6 +6,7 @@ from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, now_datetime
 
 from meeting.api import meetings as api
+from meeting.frappe_calendar import FrappeCalendar, iso_duration
 from meeting.invites import MeetingInvite
 from meeting.video import FrappeMeet
 
@@ -62,6 +63,17 @@ class TestMeeting(IntegrationTestCase):
 		if FrappeMeet.is_available():
 			self.skipTest("Frappe Suite is installed on this site")
 		self.assertRaises(frappe.ValidationError, api.create_frappe_meet_link, "Weekly sync")
+
+	def test_calendar_duration_is_iso_8601(self):
+		self.assertEqual(iso_duration(30 * 60), "PT30M")
+		self.assertEqual(iso_duration(90 * 60), "PT1H30M")
+		self.assertEqual(iso_duration(2 * 3600), "PT2H")
+
+	def test_add_to_calendar_needs_suite(self):
+		if FrappeCalendar().is_available():
+			self.skipTest("Frappe Calendar is set up for this user")
+		doc = make_meeting(add_to_calendar=1, insert=False)
+		self.assertRaises(frappe.ValidationError, doc.insert)
 
 	def test_ics_contains_event(self):
 		doc = make_meeting(attendees=[{"user": ATTENDEE}], video_link="https://meet.example.com/x")

@@ -36,14 +36,26 @@
 					<span v-if="form.meet_room" class="truncate text-sm text-ink-gray-6">Room {{ form.meet_room }}</span>
 				</div>
 			</div>
-			<FormControl
-				v-model="form.description"
-				type="textarea"
-				label="Description"
-				placeholder="What should people know before the meeting?"
-				:rows="9"
-				class="min-w-0"
-			/>
+			<div class="flex min-w-0 flex-col gap-4">
+				<div
+					v-if="session.frappeCalendarAvailable"
+					class="flex items-center gap-3 rounded-lg border border-outline-gray-2 px-3 py-2.5"
+				>
+					<FeatherIcon name="calendar" class="h-4 w-4 shrink-0 text-ink-gray-6" />
+					<span class="flex-1 text-base text-ink-gray-8">Add to Frappe Calendar</span>
+					<Switch
+						:model-value="Boolean(form.add_to_calendar)"
+						@update:model-value="(on) => (form.add_to_calendar = on ? 1 : 0)"
+					/>
+				</div>
+				<FormControl
+					v-model="form.description"
+					type="textarea"
+					label="Description"
+					placeholder="What should people know before the meeting?"
+					:rows="session.frappeCalendarAvailable ? 7 : 9"
+				/>
+			</div>
 		</div>
 
 		<!-- Attendees and agenda side by side on wide screens, stacked on small ones. -->
@@ -95,7 +107,7 @@
 import { computed, reactive, ref } from "vue"
 import { useRouter } from "vue-router"
 import dayjs from "dayjs"
-import { Avatar, Button, Checkbox, ErrorMessage, FeatherIcon, FormControl, call, toast } from "frappe-ui"
+import { Avatar, Button, Checkbox, ErrorMessage, FeatherIcon, FormControl, Switch, call, toast } from "frappe-ui"
 import AgendaEditor from "@/components/AgendaEditor.vue"
 import UserPicker from "@/components/UserPicker.vue"
 import { session } from "@/data/session"
@@ -198,6 +210,7 @@ function blankMeeting() {
 		video_provider: session.frappeMeetAvailable ? "Frappe Meet" : "",
 		video_link: "",
 		meet_room: "",
+		add_to_calendar: 0,
 		description: "",
 		attendees: [
 			{ user: session.user, email: session.user, full_name: session.fullName, rsvp: "Accepted", optional: 0 },
