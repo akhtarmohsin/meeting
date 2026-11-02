@@ -9,38 +9,42 @@
 	<div v-if="loaded" class="page max-w-3xl space-y-6">
 		<FormControl v-model="form.title" label="Title" placeholder="Weekly product sync" autofocus />
 
-		<div class="grid gap-4 sm:grid-cols-2">
+		<div class="grid gap-4 sm:grid-cols-2 md:gap-x-8">
 			<FormControl v-model="start" type="datetime-local" label="Starts" />
 			<FormControl v-model="end" type="datetime-local" label="Ends" />
 		</div>
 
-		<div class="grid gap-4 sm:grid-cols-2">
-			<FormControl v-model="form.meeting_type" type="select" label="Type" :options="meetingTypes" />
+		<!-- Where the meeting happens on the left, the description beside it. -->
+		<div class="grid gap-8 md:grid-cols-2">
+			<div class="flex min-w-0 flex-col gap-4">
+				<FormControl v-model="form.meeting_type" type="select" label="Type" :options="meetingTypes" />
+				<FormControl
+					v-if="form.meeting_type !== 'Online'"
+					v-model="form.location"
+					label="Location"
+					placeholder="Conference room A"
+				/>
+				<template v-if="form.meeting_type !== 'In Person'">
+					<FormControl v-model="form.video_provider" type="select" label="Video" :options="providers" />
+					<FormControl v-model="form.video_link" label="Meeting link" placeholder="https://meet.google.com/..." />
+				</template>
+				<div v-if="showMeetButton" class="flex items-center gap-3">
+					<Button :loading="generatingLink" @click="generateMeetLink">
+						<template #prefix><FeatherIcon name="video" class="h-4 w-4" /></template>
+						{{ form.meet_room ? "Generate new Frappe Meet link" : "Generate Frappe Meet link" }}
+					</Button>
+					<span v-if="form.meet_room" class="truncate text-sm text-ink-gray-6">Room {{ form.meet_room }}</span>
+				</div>
+			</div>
 			<FormControl
-				v-if="form.meeting_type !== 'Online'"
-				v-model="form.location"
-				label="Location"
-				placeholder="Conference room A"
+				v-model="form.description"
+				type="textarea"
+				label="Description"
+				placeholder="What should people know before the meeting?"
+				:rows="9"
+				class="min-w-0"
 			/>
 		</div>
-		<div v-if="form.meeting_type !== 'In Person'" class="grid gap-4 sm:grid-cols-3">
-			<FormControl v-model="form.video_provider" type="select" label="Video" :options="providers" />
-			<FormControl
-				v-model="form.video_link"
-				class="sm:col-span-2"
-				label="Meeting link"
-				placeholder="https://meet.google.com/..."
-			/>
-		</div>
-		<div v-if="showMeetButton" class="-mt-3 flex items-center gap-3">
-			<Button :loading="generatingLink" @click="generateMeetLink">
-				<template #prefix><FeatherIcon name="video" class="h-4 w-4" /></template>
-				{{ form.meet_room ? "Generate new Frappe Meet link" : "Generate Frappe Meet link" }}
-			</Button>
-			<span v-if="form.meet_room" class="text-sm text-ink-gray-6">Room {{ form.meet_room }}</span>
-		</div>
-
-		<FormControl v-model="form.description" type="textarea" label="Description" :rows="3" />
 
 		<!-- Attendees and agenda side by side on wide screens, stacked on small ones. -->
 		<div class="grid gap-8 md:grid-cols-2">
