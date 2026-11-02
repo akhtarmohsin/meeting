@@ -42,42 +42,45 @@
 
 		<FormControl v-model="form.description" type="textarea" label="Description" :rows="3" />
 
-		<section>
-			<div class="mb-2 text-sm text-ink-gray-6">Attendees</div>
-			<UserPicker @select="addAttendee" />
-			<div v-if="form.attendees.length" class="mt-1 flex flex-col divide-y divide-outline-gray-1">
-				<div v-for="(a, i) in form.attendees" :key="a.email" class="flex items-center gap-3 py-2.5">
-					<Avatar :label="a.full_name || a.email" size="sm" class="shrink-0" />
-					<div class="min-w-0 flex-1">
-						<div class="truncate text-base text-ink-gray-9">{{ a.full_name || a.email }}</div>
-						<div v-if="a.full_name" class="truncate text-sm text-ink-gray-6">{{ a.email }}</div>
-					</div>
-					<!-- Fixed lanes: role/optional, then remove; the organizer row leaves remove empty. -->
-					<div class="flex w-24 shrink-0 justify-end">
-						<span v-if="a.user === form.organizer" class="text-sm text-ink-gray-6">Organizer</span>
-						<Checkbox
-							v-else
-							label="Optional"
-							:model-value="Boolean(a.optional)"
-							@update:model-value="(checked) => (a.optional = checked ? 1 : 0)"
-						/>
-					</div>
-					<div class="flex w-7 shrink-0 justify-end">
-						<Button
-							v-if="a.user !== form.organizer"
-							variant="ghost"
-							size="sm"
-							:aria-label="`Remove ${a.full_name || a.email}`"
-							@click="form.attendees.splice(i, 1)"
-						>
-							<template #icon><FeatherIcon name="x" class="h-4 w-4" /></template>
-						</Button>
+		<!-- Attendees and agenda side by side on wide screens, stacked on small ones. -->
+		<div class="grid gap-8 md:grid-cols-2">
+			<section class="min-w-0">
+				<div class="mb-2 flex h-7 items-center text-sm text-ink-gray-6">Attendees</div>
+				<UserPicker @select="addAttendee" />
+				<div v-if="form.attendees.length" class="mt-1 flex flex-col divide-y divide-outline-gray-1">
+					<div v-for="(a, i) in form.attendees" :key="a.email" class="flex items-center gap-3 py-2.5">
+						<Avatar :label="a.full_name || a.email" size="sm" class="shrink-0" />
+						<div class="min-w-0 flex-1">
+							<div class="truncate text-base text-ink-gray-9">{{ a.full_name || a.email }}</div>
+							<div v-if="a.full_name" class="truncate text-sm text-ink-gray-6">{{ a.email }}</div>
+						</div>
+						<!-- Fixed lanes: role/optional, then remove; the organizer row leaves remove empty. -->
+						<div class="flex w-24 shrink-0 justify-end">
+							<span v-if="a.user === form.organizer" class="text-sm text-ink-gray-6">Organizer</span>
+							<Checkbox
+								v-else
+								label="Optional"
+								:model-value="Boolean(a.optional)"
+								@update:model-value="(checked) => (a.optional = checked ? 1 : 0)"
+							/>
+						</div>
+						<div class="flex w-7 shrink-0 justify-end">
+							<Button
+								v-if="a.user !== form.organizer"
+								variant="ghost"
+								size="sm"
+								:aria-label="`Remove ${a.full_name || a.email}`"
+								@click="form.attendees.splice(i, 1)"
+							>
+								<template #icon><FeatherIcon name="x" class="h-4 w-4" /></template>
+							</Button>
+						</div>
 					</div>
 				</div>
-			</div>
-		</section>
+			</section>
 
-		<AgendaEditor v-model="form.agenda" />
+			<AgendaEditor v-model="form.agenda" class="min-w-0" />
+		</div>
 
 		<Checkbox v-if="!name" v-model="sendInvites" label="Email invites to attendees after saving" />
 		<ErrorMessage :message="error" />

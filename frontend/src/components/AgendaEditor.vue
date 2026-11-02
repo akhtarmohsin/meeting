@@ -1,6 +1,6 @@
 <template>
 	<section>
-		<div class="mb-2 flex items-center justify-between">
+		<div class="mb-2 flex h-7 items-center justify-between">
 			<span class="text-sm text-ink-gray-6">
 				Agenda <span v-if="totalMinutes">· {{ totalMinutes }} min</span>
 			</span>
