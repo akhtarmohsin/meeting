@@ -19,13 +19,12 @@
 					:class="{ 'cursor-pointer': canEdit }"
 					@click="canEdit && edit(item)"
 				>
-					<input
-						type="checkbox"
+					<Checkbox
 						class="mt-0.5 shrink-0"
-						:checked="item.discussed"
+						:model-value="Boolean(item.discussed)"
 						:disabled="!canEdit"
 						@click.stop
-						@change="toggleDiscussed(item, $event.target.checked)"
+						@update:model-value="(checked) => toggleDiscussed(item, checked)"
 					/>
 					<span class="w-5 shrink-0 text-base tabular-nums text-ink-gray-5">{{ i + 1 }}.</span>
 					<div class="flex min-w-0 flex-1 flex-col gap-1">
@@ -60,7 +59,7 @@
 
 <script setup>
 import { computed, ref } from "vue"
-import { Button, FeatherIcon } from "frappe-ui"
+import { Button, Checkbox, FeatherIcon } from "frappe-ui"
 import AgendaItemDialog from "@/components/AgendaItemDialog.vue"
 import EmptyState from "@/components/EmptyState.vue"
 

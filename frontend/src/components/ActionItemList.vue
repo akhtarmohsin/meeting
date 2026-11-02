@@ -14,12 +14,11 @@
 				class="-mx-3 flex cursor-pointer items-center gap-3 rounded-md px-3 py-3 hover:bg-surface-gray-1"
 				@click="edit(item)"
 			>
-				<input
-					type="checkbox"
+				<Checkbox
 					class="shrink-0"
-					:checked="item.status === 'Done'"
+					:model-value="item.status === 'Done'"
 					@click.stop
-					@change="toggleDone(item, $event.target.checked)"
+					@update:model-value="(checked) => toggleDone(item, checked)"
 				/>
 				<div class="min-w-0 flex-1">
 					<div
@@ -61,7 +60,7 @@
 
 <script setup>
 import { ref } from "vue"
-import { Avatar, Badge, Button, FeatherIcon, call } from "frappe-ui"
+import { Avatar, Badge, Button, Checkbox, FeatherIcon, call } from "frappe-ui"
 import ActionItemDialog from "@/components/ActionItemDialog.vue"
 import EmptyState from "@/components/EmptyState.vue"
 import { ACTION_STATUS_THEME, formatDate, isOverdue } from "@/utils"

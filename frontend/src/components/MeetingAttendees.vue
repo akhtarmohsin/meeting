@@ -15,13 +15,13 @@
 				<div class="flex w-20 shrink-0 justify-end">
 					<Badge :label="a.rsvp" :theme="RSVP_THEME[a.rsvp]" />
 				</div>
-				<label
-					v-if="showAttended"
-					class="flex w-24 shrink-0 cursor-pointer items-center justify-end gap-1.5 text-sm text-ink-gray-7"
-				>
-					<input type="checkbox" :checked="a.attended" @change="toggleAttended(a, $event.target.checked)" />
-					Attended
-				</label>
+				<div v-if="showAttended" class="flex w-24 shrink-0 justify-end">
+					<Checkbox
+						label="Attended"
+						:model-value="Boolean(a.attended)"
+						@update:model-value="(checked) => toggleAttended(a, checked)"
+					/>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -29,7 +29,7 @@
 
 <script setup>
 import { computed } from "vue"
-import { Avatar, Badge } from "frappe-ui"
+import { Avatar, Badge, Checkbox } from "frappe-ui"
 import { RSVP_THEME } from "@/utils"
 
 const props = defineProps({ doc: Object, canEdit: Boolean, save: Function })

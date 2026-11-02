@@ -55,10 +55,12 @@
 					<!-- Fixed lanes: role/optional, then remove; the organizer row leaves remove empty. -->
 					<div class="flex w-24 shrink-0 justify-end">
 						<span v-if="a.user === form.organizer" class="text-sm text-ink-gray-6">Organizer</span>
-						<label v-else class="flex cursor-pointer items-center gap-1.5 text-sm text-ink-gray-7">
-							<input v-model="a.optional" type="checkbox" :true-value="1" :false-value="0" />
-							Optional
-						</label>
+						<Checkbox
+							v-else
+							label="Optional"
+							:model-value="Boolean(a.optional)"
+							@update:model-value="(checked) => (a.optional = checked ? 1 : 0)"
+						/>
 					</div>
 					<div class="flex w-7 shrink-0 justify-end">
 						<Button
@@ -77,10 +79,7 @@
 
 		<AgendaEditor v-model="form.agenda" />
 
-		<label v-if="!name" class="flex items-center gap-2 text-base text-ink-gray-7">
-			<input v-model="sendInvites" type="checkbox" />
-			Email invites to attendees after saving
-		</label>
+		<Checkbox v-if="!name" v-model="sendInvites" label="Email invites to attendees after saving" />
 		<ErrorMessage :message="error" />
 	</div>
 </template>
@@ -89,7 +88,7 @@
 import { computed, reactive, ref } from "vue"
 import { useRouter } from "vue-router"
 import dayjs from "dayjs"
-import { Avatar, Button, ErrorMessage, FeatherIcon, FormControl, call, toast } from "frappe-ui"
+import { Avatar, Button, Checkbox, ErrorMessage, FeatherIcon, FormControl, call, toast } from "frappe-ui"
 import AgendaEditor from "@/components/AgendaEditor.vue"
 import UserPicker from "@/components/UserPicker.vue"
 import { session } from "@/data/session"
