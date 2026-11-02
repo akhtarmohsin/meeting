@@ -6,8 +6,8 @@
 			New
 		</Button>
 	</header>
-	<div class="page">
-		<div class="mb-5 flex flex-wrap items-center gap-3">
+	<div class="page flex flex-col gap-6">
+		<div class="flex flex-wrap items-center gap-3">
 			<TabButtons v-model="view" :buttons="views" />
 			<TextInput v-model="search" placeholder="Search meetings" class="w-full sm:ml-auto sm:w-64">
 				<template #prefix><FeatherIcon name="search" class="h-4 w-4" /></template>
@@ -23,9 +23,9 @@
 			action="Schedule a meeting"
 			:to="{ name: 'NewMeeting' }"
 		/>
-		<div v-for="group in groups" v-else :key="group.label" class="mb-6">
-			<div class="mb-2 text-sm font-medium text-ink-gray-5">{{ group.label }}</div>
-			<div class="space-y-2">
+		<div v-for="group in groups" v-else :key="group.label" class="flex flex-col">
+			<div class="text-sm font-medium text-ink-gray-6">{{ group.label }}</div>
+			<div class="flex flex-col">
 				<MeetingRow
 					v-for="m in group.meetings"
 					:key="m.name"

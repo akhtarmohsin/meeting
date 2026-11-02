@@ -1,8 +1,11 @@
 <template>
-	<div class="flex flex-col items-center justify-center rounded-lg border border-dashed px-6 py-10 text-center">
-		<FeatherIcon :name="icon" class="h-6 w-6 text-ink-gray-4" />
-		<p class="mt-2 text-base text-ink-gray-6">{{ title }}</p>
-		<Button v-if="action" class="mt-3" :route="to" @click="$emit('action')">{{ action }}</Button>
+	<div class="flex flex-col items-center gap-3 py-12 text-center">
+		<FeatherIcon :name="icon" class="h-5 w-5 text-ink-gray-4" />
+		<p class="text-base text-ink-gray-6">{{ title }}</p>
+		<Button v-if="action" variant="ghost" :route="to" @click="$emit('action')">
+			<template #prefix><FeatherIcon name="plus" class="h-4 w-4" /></template>
+			{{ action }}
+		</Button>
 	</div>
 </template>
 

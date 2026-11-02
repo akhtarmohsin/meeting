@@ -37,34 +37,40 @@
 				<template #prefix><FeatherIcon name="video" class="h-4 w-4" /></template>
 				{{ form.meet_room ? "Generate new Frappe Meet link" : "Generate Frappe Meet link" }}
 			</Button>
-			<span v-if="form.meet_room" class="text-sm text-ink-gray-5">Room {{ form.meet_room }}</span>
+			<span v-if="form.meet_room" class="text-sm text-ink-gray-6">Room {{ form.meet_room }}</span>
 		</div>
 
 		<FormControl v-model="form.description" type="textarea" label="Description" :rows="3" />
 
 		<section>
-			<div class="mb-2 text-sm text-ink-gray-5">Attendees</div>
+			<div class="mb-2 text-sm text-ink-gray-6">Attendees</div>
 			<UserPicker @select="addAttendee" />
-			<div class="mt-2 divide-y rounded-lg border" v-if="form.attendees.length">
-				<div v-for="(a, i) in form.attendees" :key="a.email" class="flex items-center gap-3 px-3 py-2">
-					<Avatar :label="a.full_name || a.email" size="sm" />
+			<div v-if="form.attendees.length" class="mt-1 flex flex-col divide-y divide-outline-gray-1">
+				<div v-for="(a, i) in form.attendees" :key="a.email" class="flex items-center gap-3 py-2.5">
+					<Avatar :label="a.full_name || a.email" size="sm" class="shrink-0" />
 					<div class="min-w-0 flex-1">
 						<div class="truncate text-base text-ink-gray-9">{{ a.full_name || a.email }}</div>
-						<div v-if="a.full_name" class="truncate text-sm text-ink-gray-5">{{ a.email }}</div>
+						<div v-if="a.full_name" class="truncate text-sm text-ink-gray-6">{{ a.email }}</div>
 					</div>
-					<Badge v-if="a.user === form.organizer" label="Organizer" />
-					<label v-else class="flex items-center gap-1.5 text-sm text-ink-gray-6">
-						<input v-model="a.optional" type="checkbox" :true-value="1" :false-value="0" />
-						Optional
-					</label>
-					<Button
-						v-if="a.user !== form.organizer"
-						variant="ghost"
-						size="sm"
-						@click="form.attendees.splice(i, 1)"
-					>
-						<template #icon><FeatherIcon name="x" class="h-4 w-4" /></template>
-					</Button>
+					<!-- Fixed lanes: role/optional, then remove; the organizer row leaves remove empty. -->
+					<div class="flex w-24 shrink-0 justify-end">
+						<span v-if="a.user === form.organizer" class="text-sm text-ink-gray-6">Organizer</span>
+						<label v-else class="flex cursor-pointer items-center gap-1.5 text-sm text-ink-gray-7">
+							<input v-model="a.optional" type="checkbox" :true-value="1" :false-value="0" />
+							Optional
+						</label>
+					</div>
+					<div class="flex w-7 shrink-0 justify-end">
+						<Button
+							v-if="a.user !== form.organizer"
+							variant="ghost"
+							size="sm"
+							:aria-label="`Remove ${a.full_name || a.email}`"
+							@click="form.attendees.splice(i, 1)"
+						>
+							<template #icon><FeatherIcon name="x" class="h-4 w-4" /></template>
+						</Button>
+					</div>
 				</div>
 			</div>
 		</section>
@@ -83,7 +89,7 @@
 import { computed, reactive, ref } from "vue"
 import { useRouter } from "vue-router"
 import dayjs from "dayjs"
-import { Avatar, Badge, Button, ErrorMessage, FeatherIcon, FormControl, call, toast } from "frappe-ui"
+import { Avatar, Button, ErrorMessage, FeatherIcon, FormControl, call, toast } from "frappe-ui"
 import AgendaEditor from "@/components/AgendaEditor.vue"
 import UserPicker from "@/components/UserPicker.vue"
 import { session } from "@/data/session"

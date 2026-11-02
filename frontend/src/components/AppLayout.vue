@@ -10,7 +10,7 @@
 						<img :src="logo" class="h-8 w-8 rounded-md" />
 						<div class="min-w-0 flex-1">
 							<div class="text-base font-medium text-ink-gray-9">Meeting</div>
-							<div class="truncate text-sm text-ink-gray-5">{{ session.fullName }}</div>
+							<div class="truncate text-sm text-ink-gray-6">{{ session.fullName }}</div>
 						</div>
 						<FeatherIcon name="chevron-down" class="h-4 w-4 text-ink-gray-5" />
 					</button>
@@ -22,7 +22,7 @@
 			</nav>
 
 			<div class="p-2">
-				<Button variant="solid" class="w-full" :route="{ name: 'NewMeeting' }">
+				<Button variant="subtle" class="w-full" :route="{ name: 'NewMeeting' }">
 					<template #prefix><FeatherIcon name="plus" class="h-4 w-4" /></template>
 					New Meeting
 				</Button>
@@ -38,7 +38,7 @@
 					v-for="link in links"
 					:key="link.label"
 					:to="link.to"
-					class="flex flex-1 flex-col items-center justify-center gap-0.5 text-xs text-ink-gray-5"
+					class="flex flex-1 flex-col items-center justify-center gap-0.5 text-xs text-ink-gray-6"
 					exact-active-class="!text-ink-gray-9"
 				>
 					<FeatherIcon :name="link.icon" class="h-5 w-5" />
@@ -46,7 +46,7 @@
 				</router-link>
 				<router-link
 					:to="{ name: 'NewMeeting' }"
-					class="flex flex-1 flex-col items-center justify-center gap-0.5 text-xs text-ink-gray-5"
+					class="flex flex-1 flex-col items-center justify-center gap-0.5 text-xs text-ink-gray-6"
 				>
 					<FeatherIcon name="plus-circle" class="h-5 w-5" />
 					New

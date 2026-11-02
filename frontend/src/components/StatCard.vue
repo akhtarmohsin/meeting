@@ -2,26 +2,23 @@
 	<component
 		:is="to ? 'router-link' : 'div'"
 		:to="to"
-		class="rounded-lg border p-4"
-		:class="{ 'hover:bg-surface-gray-1': to }"
+		class="flex flex-col gap-1.5 py-1 sm:px-6 sm:first:pl-0"
+		:class="{ 'group': to }"
 	>
-		<div class="flex items-center justify-between text-sm text-ink-gray-5">
-			{{ label }}
-			<FeatherIcon :name="icon" class="h-4 w-4" />
-		</div>
-		<div class="mt-2 text-2xl font-semibold" :class="danger ? 'text-ink-red-4' : 'text-ink-gray-9'">
+		<span class="text-sm text-ink-gray-6 group-hover:text-ink-gray-8">{{ label }}</span>
+		<span
+			class="text-2xl font-semibold leading-none tabular-nums"
+			:class="danger ? 'text-ink-red-4' : 'text-ink-gray-9'"
+		>
 			{{ value ?? "–" }}
-		</div>
+		</span>
 	</component>
 </template>
 
 <script setup>
-import { FeatherIcon } from "frappe-ui"
-
 defineProps({
 	label: String,
 	value: Number,
-	icon: String,
 	danger: Boolean,
 	to: Object,
 })

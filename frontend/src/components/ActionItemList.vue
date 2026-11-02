@@ -1,46 +1,58 @@
 <template>
 	<div>
-		<div v-if="meeting" class="mb-3 flex justify-end">
+		<div v-if="meeting" class="flex justify-end pb-2">
 			<Button @click="edit(null)">
 				<template #prefix><FeatherIcon name="plus" class="h-4 w-4" /></template>
 				Add action item
 			</Button>
 		</div>
 		<EmptyState v-if="!items.length" icon="check-square" :title="emptyText" />
-		<div v-else class="divide-y rounded-lg border">
+		<div v-else class="flex flex-col">
 			<div
 				v-for="item in items"
 				:key="item.name"
-				class="flex cursor-pointer items-center gap-3 px-4 py-2.5 hover:bg-surface-gray-1"
+				class="-mx-3 flex cursor-pointer items-center gap-3 rounded-md px-3 py-3 hover:bg-surface-gray-1"
 				@click="edit(item)"
 			>
 				<input
 					type="checkbox"
+					class="shrink-0"
 					:checked="item.status === 'Done'"
 					@click.stop
 					@change="toggleDone(item, $event.target.checked)"
 				/>
 				<div class="min-w-0 flex-1">
-					<div class="truncate text-base text-ink-gray-9" :class="{ 'line-through text-ink-gray-5': item.status === 'Done' }">
+					<div
+						class="truncate text-base font-medium"
+						:class="item.status === 'Done' ? 'text-ink-gray-5 line-through' : 'text-ink-gray-9'"
+					>
 						{{ item.title }}
 					</div>
-					<div class="mt-0.5 flex items-center gap-2 truncate text-sm text-ink-gray-5">
+					<div class="mt-1 flex items-center gap-1.5 truncate text-sm text-ink-gray-6">
 						<router-link
 							v-if="showMeeting && item.meeting"
 							:to="{ name: 'Meeting', params: { name: item.meeting } }"
-							class="hover:underline"
+							class="truncate hover:text-ink-gray-8 hover:underline"
 							@click.stop
 						>
 							{{ item.meeting_title || item.meeting }}
 						</router-link>
-						<span v-if="item.due_date" :class="{ 'text-ink-red-4': isOverdue(item) }">
-							Due {{ formatDate(item.due_date, "D MMM") }}
+						<span v-if="showMeeting && item.meeting && item.due_date">·</span>
+						<span v-if="item.due_date" class="shrink-0" :class="{ 'font-medium text-ink-red-4': isOverdue(item) }">
+							{{ isOverdue(item) ? "Overdue" : "Due" }} {{ formatDate(item.due_date, "D MMM") }}
 						</span>
 					</div>
 				</div>
-				<Badge v-if="item.priority === 'High'" label="High" theme="red" />
-				<Badge :label="item.status" :theme="ACTION_STATUS_THEME[item.status]" />
-				<Avatar v-if="item.assigned_to" :label="item.assigned_to" size="sm" />
+				<!-- Fixed lanes keep priority, status and assignee aligned across rows. -->
+				<div class="hidden w-12 shrink-0 justify-end sm:flex">
+					<span v-if="item.priority === 'High'" class="text-sm font-medium text-ink-red-4">High</span>
+				</div>
+				<div class="flex w-24 shrink-0 justify-end">
+					<Badge :label="item.status" :theme="ACTION_STATUS_THEME[item.status]" />
+				</div>
+				<div class="flex w-6 shrink-0 justify-end">
+					<Avatar v-if="item.assigned_to" :label="item.assigned_to" size="sm" />
+				</div>
 			</div>
 		</div>
 		<ActionItemDialog v-model="dialog" :item="selected" :meeting="meeting" :people="people" @saved="$emit('changed')" />

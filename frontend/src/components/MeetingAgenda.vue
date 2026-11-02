@@ -1,27 +1,42 @@
 <template>
-	<div>
+	<div class="flex flex-col gap-2">
 		<EmptyState v-if="!doc.agenda.length" icon="list" title="No agenda for this meeting" />
-		<div v-else class="divide-y rounded-lg border">
-			<div v-for="(item, i) in doc.agenda" :key="item.name" class="flex items-start gap-3 px-4 py-3">
-				<input
-					type="checkbox"
-					class="mt-1"
-					:checked="item.discussed"
-					:disabled="!canEdit"
-					@change="toggleDiscussed(item, $event.target.checked)"
-				/>
-				<div class="min-w-0 flex-1">
-					<div class="text-base text-ink-gray-9" :class="{ 'line-through text-ink-gray-5': item.discussed }">
-						{{ i + 1 }}. {{ item.topic }}
+		<template v-else>
+			<p class="text-sm text-ink-gray-6">
+				{{ discussedCount }} of {{ doc.agenda.length }} discussed · {{ totalMinutes }} min planned
+			</p>
+			<div class="flex flex-col divide-y divide-outline-gray-1">
+				<label
+					v-for="(item, i) in doc.agenda"
+					:key="item.name"
+					class="flex items-start gap-3 py-3"
+					:class="{ 'cursor-pointer': canEdit }"
+				>
+					<input
+						type="checkbox"
+						class="mt-0.5 shrink-0"
+						:checked="item.discussed"
+						:disabled="!canEdit"
+						@change="toggleDiscussed(item, $event.target.checked)"
+					/>
+					<span class="w-5 shrink-0 text-base tabular-nums text-ink-gray-5">{{ i + 1 }}.</span>
+					<div class="flex min-w-0 flex-1 flex-col gap-1">
+						<span
+							class="text-base font-medium"
+							:class="item.discussed ? 'text-ink-gray-5 line-through' : 'text-ink-gray-9'"
+						>
+							{{ item.topic }}
+						</span>
+						<span v-if="item.notes" class="whitespace-pre-line text-sm leading-relaxed text-ink-gray-7">
+							{{ item.notes }}
+						</span>
 					</div>
-					<div v-if="item.notes" class="mt-1 whitespace-pre-line text-sm text-ink-gray-6">{{ item.notes }}</div>
-				</div>
-				<span v-if="item.duration" class="shrink-0 text-sm text-ink-gray-5">{{ item.duration }} min</span>
+					<span class="w-14 shrink-0 text-right text-sm tabular-nums text-ink-gray-6">
+						{{ item.duration ? `${item.duration} min` : "" }}
+					</span>
+				</label>
 			</div>
-		</div>
-		<div v-if="doc.agenda.length" class="mt-2 text-sm text-ink-gray-5">
-			{{ discussedCount }} of {{ doc.agenda.length }} discussed · {{ totalMinutes }} min planned
-		</div>
+		</template>
 	</div>
 </template>
 

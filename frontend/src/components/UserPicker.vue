@@ -22,7 +22,7 @@
 				<Avatar :label="u.full_name" :image="u.user_image" size="sm" />
 				<div class="min-w-0">
 					<div class="truncate text-base text-ink-gray-9">{{ u.full_name }}</div>
-					<div class="truncate text-sm text-ink-gray-5">{{ u.email }}</div>
+					<div class="truncate text-sm text-ink-gray-6">{{ u.email }}</div>
 				</div>
 			</button>
 			<button

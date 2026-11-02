@@ -1,7 +1,7 @@
 <template>
 	<div class="space-y-4">
 		<div>
-			<div class="mb-2 text-sm text-ink-gray-5">Minutes</div>
+			<div class="mb-2 text-sm text-ink-gray-6">Minutes</div>
 			<TextEditor
 				:content="minutes"
 				:editable="canEdit"
