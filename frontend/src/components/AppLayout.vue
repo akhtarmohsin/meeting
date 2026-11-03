@@ -20,6 +20,7 @@
 				<SidebarCollapseToggle />
 			</div>
 		</Sidebar>
+		<SettingsDialog v-model:open="showSettings" />
 
 		<div class="flex min-w-0 flex-1 flex-col">
 			<main class="flex-1 overflow-y-auto pb-14 sm:pb-0">
@@ -61,6 +62,7 @@ import {
 	createResource,
 	useColorScheme,
 } from "frappe-ui"
+import SettingsDialog from "@/components/settings/SettingsDialog.vue"
 import { session } from "@/data/session"
 
 const logo = "/assets/meeting/images/logo.svg"
@@ -70,6 +72,7 @@ const SUPPORT_URL = "https://discuss.frappe.io"
 const route = useRoute()
 const router = useRouter()
 const collapsed = ref(false)
+const showSettings = ref(false)
 const { colorScheme, setColorScheme } = useColorScheme()
 
 const links = [
@@ -105,7 +108,7 @@ const menuItems = computed(() => [
 		group: "Others",
 		hideLabel: true,
 		options: [
-			{ label: "Settings", icon: "lucide-settings", onClick: () => (window.location.href = `/desk/user/${session.user}`) },
+			{ label: "Settings", icon: "lucide-settings", onClick: () => (showSettings.value = true) },
 			{ label: "Log out", icon: "lucide-log-out", onClick: () => session.logout() },
 		],
 	},
