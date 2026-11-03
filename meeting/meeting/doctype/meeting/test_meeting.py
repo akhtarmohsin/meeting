@@ -170,6 +170,43 @@ class TestMeeting(IntegrationTestCase):
 		self.assertEqual(parse_duration("PT45M"), timedelta(minutes=45))
 		self.assertEqual(parse_duration("P1DT2H"), timedelta(days=1, hours=2))
 
+	def test_minutes_pending_counts_only_my_ended_meetings_without_minutes(self):
+		past = add_to_date(now_datetime(), days=-2)
+		frappe.set_user(ORGANIZER)
+		blank = make_meeting(start=past, minutes="<p></p>")
+		mine = {
+			blank.name,
+			make_meeting(start=past, minutes="<p>Agreed to ship.</p>").name,
+			make_meeting(start=past, status="Cancelled").name,
+			make_meeting().name,  # still to come
+		}
+		frappe.set_user("Administrator")
+		mine.add(make_meeting(start=past, organizer=ATTENDEE).name)  # someone else's
+
+		frappe.set_user(ORGANIZER)
+		pending = {m.name for m in api.meetings_needing_minutes(ORGANIZER)}
+		# Only check this test's meetings; other tests leave meetings behind.
+		self.assertEqual(pending & mine, {blank.name})
+		self.assertEqual(api.get_dashboard()["minutes_pending"], len(pending))
+		self.assertEqual({m.name for m in api.get_meetings("minutes_pending")}, pending)
+
+	def test_awaiting_reply_lists_only_unanswered_invites_still_to_come(self):
+		waiting = make_meeting(attendees=[{"user": ATTENDEE}])
+		answered = make_meeting(attendees=[{"user": ATTENDEE}])
+		answered.set_rsvp(ATTENDEE, "Accepted")
+		others = [
+			answered,
+			make_meeting(attendees=[{"user": ATTENDEE}], status="Cancelled"),
+			make_meeting(start=add_to_date(now_datetime(), days=-2), attendees=[{"user": ATTENDEE}], minutes="<p>Done</p>"),
+			make_meeting(),  # not invited
+		]
+
+		frappe.set_user(ATTENDEE)
+		listed = {m.name for m in api.get_meetings("awaiting_reply")}
+		self.assertIn(waiting.name, listed)
+		self.assertFalse(listed & {m.name for m in others})
+		self.assertEqual(api.get_dashboard()["pending_rsvp"], len(listed))
+
 	def test_ics_contains_event(self):
 		doc = make_meeting(attendees=[{"user": ATTENDEE}], video_link="https://meet.example.com/x")
 		ics = MeetingInvite(doc).ics()

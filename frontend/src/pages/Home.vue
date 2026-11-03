@@ -14,7 +14,16 @@
 
 		<div class="grid grid-cols-2 gap-y-5 sm:flex sm:divide-x sm:divide-outline-gray-2">
 			<StatCard label="Meetings today" :value="data?.today.length" />
-			<StatCard label="Awaiting your RSVP" :value="data?.pending_rsvp" />
+			<StatCard
+				label="Awaiting your reply"
+				:value="data?.pending_rsvp"
+				:to="{ name: 'Meetings', query: { view: 'awaiting_reply' } }"
+			/>
+			<StatCard
+				label="Minutes pending"
+				:value="data?.minutes_pending"
+				:to="{ name: 'Meetings', query: { view: 'minutes_pending' } }"
+			/>
 			<StatCard label="Open action items" :value="data?.open_action_items" :to="{ name: 'ActionItems' }" />
 			<StatCard
 				label="Overdue"

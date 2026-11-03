@@ -2,11 +2,13 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.utils import get_datetime
 
+from meeting.api.meetings import meetings_needing_minutes
 from meeting.demo import MeetingDemo
 
 DEMO_TITLES = {
 	"Q4 Business Review",
 	"Sales Pipeline Review",
+	"Vendor Evaluation Call",
 	"Hiring Sync",
 	"Marketing Campaign Kickoff",
 	"Design Review",
@@ -27,6 +29,9 @@ class TestMeetingDemo(IntegrationTestCase):
 		self.assertEqual(set(titles), DEMO_TITLES)
 		self.assertEqual(titles.count("Engineering Standup"), 9)
 		self.assertEqual(frappe.db.count("Meeting Action Item"), 7)
+		self.assertEqual(
+			[m.title for m in meetings_needing_minutes("Administrator")], ["Vendor Evaluation Call"]
+		)
 		self.assertEqual(frappe.db.count("Email Queue"), emails_before)
 		for group in ("Sales Team", "Engineering", "Marketing", "Leadership"):
 			self.assertTrue(frappe.db.exists("User Group", group))

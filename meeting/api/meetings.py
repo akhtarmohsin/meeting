@@ -1,6 +1,6 @@
 import frappe
 from frappe import _
-from frappe.utils import add_days, getdate, now_datetime, today
+from frappe.utils import add_days, getdate, now_datetime, strip_html, today
 
 from meeting.calendar_sync import CalendarChanges
 from meeting.invites import MeetingInvite
@@ -44,6 +44,11 @@ EDITABLE_FIELDS = {
 
 @frappe.whitelist()
 def get_meetings(view: str = "upcoming", search: str | None = None, limit: int = 100) -> list[dict]:
+	if view in ("minutes_pending", "awaiting_reply"):
+		find = meetings_needing_minutes if view == "minutes_pending" else meetings_awaiting_reply
+		meetings = find(frappe.session.user, search)
+		attach_attendees(meetings)
+		return meetings
 	filters = {"upcoming": [["end", ">=", now_datetime()], ["status", "!=", "Cancelled"]],
 		"past": [["end", "<", now_datetime()]], "all": []}[view]
 	if search:
@@ -128,7 +133,8 @@ def get_dashboard() -> dict:
 	return {
 		"today": todays,
 		"upcoming": get_meetings("upcoming", limit=6),
-		"pending_rsvp": pending_rsvp_count(user),
+		"pending_rsvp": len(meetings_awaiting_reply(user)),
+		"minutes_pending": len(meetings_needing_minutes(user)),
 		"open_action_items": frappe.db.count(
 			"Meeting Action Item", {"assigned_to": user, "status": ["in", ["Open", "In Progress"]]}
 		),
@@ -238,23 +244,34 @@ def get_meetings_between(start, end) -> list[dict]:
 	return meetings
 
 
-def pending_rsvp_count(user: str) -> int:
-	Meeting = frappe.qb.DocType("Meeting")
-	Attendee = frappe.qb.DocType("Meeting Attendee")
-	rows = (
-		frappe.qb.from_(Attendee)
-		.join(Meeting)
-		.on(Meeting.name == Attendee.parent)
-		.select(Attendee.name)
-		.where(
-			(Attendee.parenttype == "Meeting")
-			& (Attendee.user == user)
-			& (Attendee.rsvp == "Pending")
-			& (Meeting.status == "Scheduled")
-			& (Meeting.start >= now_datetime())
-		)
-	).run()
-	return len(rows)
+def meetings_needing_minutes(user: str, search: str | None = None) -> list[dict]:
+	"""Meetings the user organised that have ended, weren't cancelled, and still have no minutes."""
+	filters = [["organizer", "=", user], ["end", "<", now_datetime()], ["status", "!=", "Cancelled"]]
+	if search:
+		filters.append(["title", "like", f"%{search}%"])
+	meetings = frappe.get_list(
+		"Meeting", fields=[*MEETING_LIST_FIELDS, "minutes"], filters=filters, order_by="start desc", limit=200
+	)
+	# An editor opened and left blank saves "<p></p>", which still means no minutes.
+	pending = [m for m in meetings if not strip_html(m.minutes or "").strip()]
+	for m in pending:
+		del m["minutes"]
+	return pending
+
+
+def meetings_awaiting_reply(user: str, search: str | None = None) -> list[dict]:
+	"""Scheduled meetings still to come that the user was invited to and hasn't answered."""
+	invited = frappe.get_all(
+		"Meeting Attendee",
+		filters={"parenttype": "Meeting", "user": user, "rsvp": "Pending"},
+		pluck="parent",
+	)
+	filters = [["name", "in", invited or [""]], ["status", "=", "Scheduled"], ["start", ">=", now_datetime()]]
+	if search:
+		filters.append(["title", "like", f"%{search}%"])
+	return frappe.get_list(
+		"Meeting", fields=MEETING_LIST_FIELDS, filters=filters, order_by="start asc", limit=200
+	)
 
 
 def attach_attendees(meetings: list[dict]) -> None:

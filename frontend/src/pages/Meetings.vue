@@ -19,7 +19,7 @@
 		<EmptyState
 			v-else-if="!meetings.data?.length"
 			icon="lucide-calendar"
-			:title="search ? 'No meetings match your search' : `No ${view} meetings`"
+			:title="search ? 'No meetings match your search' : EMPTY[view]"
 			action="Schedule a meeting"
 			:to="{ name: 'NewMeeting' }"
 		/>
@@ -30,7 +30,7 @@
 					v-for="m in group.meetings"
 					:key="m.name"
 					:meeting="m"
-					:show-join="view === 'upcoming'"
+					:show-join="['upcoming', 'awaiting_reply'].includes(view)"
 				/>
 			</div>
 		</div>
@@ -39,6 +39,7 @@
 
 <script setup>
 import { computed, ref, watch } from "vue"
+import { useRoute } from "vue-router"
 import { Button, Icon, TabButtons, TextInput, createResource, debounce } from "frappe-ui"
 import EmptyState from "@/components/EmptyState.vue"
 import MeetingRow from "@/components/MeetingRow.vue"
@@ -47,9 +48,20 @@ import { errorMessage, groupByDay } from "@/utils"
 const views = [
 	{ label: "Upcoming", value: "upcoming" },
 	{ label: "Past", value: "past" },
+	{ label: "Awaiting reply", value: "awaiting_reply" },
+	{ label: "Minutes pending", value: "minutes_pending" },
 	{ label: "All", value: "all" },
 ]
-const view = ref("upcoming")
+const EMPTY = {
+	upcoming: "No upcoming meetings",
+	past: "No past meetings",
+	awaiting_reply: "You've replied to every invitation",
+	minutes_pending: "Every meeting you ran has its minutes",
+	all: "No meetings yet",
+}
+// Home's stat cards link here with ?view=awaiting_reply or ?view=minutes_pending.
+const route = useRoute()
+const view = ref(views.some((v) => v.value === route.query.view) ? route.query.view : "upcoming")
 const search = ref("")
 
 const meetings = createResource({

@@ -94,6 +94,22 @@ class MeetingDemo:
 		G = self.groups
 		self.q4_review(G)
 		self.sales_review(G)
+		# Finished but never written up, so Home's "Minutes pending" has something to show.
+		self.meeting(
+			"Vendor Evaluation Call",
+			self.at(self.past_weekday(1), "16:00"),
+			minutes=45,
+			people=[ADMIN, u("karthik.nair"), u("meera.krishnan")],
+			status="Completed",
+			meeting_type="Online",
+			video_provider="Google Meet",
+			video_link="https://meet.google.com/vnd-eval-0411",
+			description="Compare three payroll vendors before renewal.",
+			agenda=[
+				{"topic": "Pricing comparison", "presenter": u("meera.krishnan"), "duration": 20, "discussed": 1},
+				{"topic": "Integration effort", "presenter": u("karthik.nair"), "duration": 20, "discussed": 1},
+			],
+		)
 		self.meeting(
 			"Hiring Sync",
 			self.now.replace(minute=self.now.minute // 15 * 15),
