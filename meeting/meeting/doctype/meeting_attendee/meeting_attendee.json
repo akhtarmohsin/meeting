@@ -1,0 +1,77 @@
+{
+ "actions": [],
+ "creation": "2026-10-31 12:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "email",
+  "full_name",
+  "rsvp",
+  "optional",
+  "attended"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "idx": 1,
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "idx": 2,
+   "in_list_view": 1,
+   "label": "Email",
+   "options": "Email",
+   "reqd": 1
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "idx": 3,
+   "in_list_view": 1,
+   "label": "Full Name"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "rsvp",
+   "fieldtype": "Select",
+   "idx": 4,
+   "in_list_view": 1,
+   "label": "RSVP",
+   "options": "Pending\nAccepted\nDeclined\nTentative"
+  },
+  {
+   "default": "0",
+   "fieldname": "optional",
+   "fieldtype": "Check",
+   "idx": 5,
+   "label": "Optional"
+  },
+  {
+   "default": "0",
+   "fieldname": "attended",
+   "fieldtype": "Check",
+   "idx": 6,
+   "in_list_view": 1,
+   "label": "Attended"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-10-31 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Meeting",
+ "name": "Meeting Attendee",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

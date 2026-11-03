@@ -1,0 +1,13 @@
+@import "frappe-ui/style.css";
+
+body {
+	@apply bg-surface-base text-ink-gray-9 antialiased;
+}
+
+.page {
+	@apply mx-auto w-full max-w-5xl px-5 py-6;
+}
+
+.page-header {
+	@apply sticky top-0 z-10 flex h-12 items-center justify-between border-b bg-surface-base px-5;
+}

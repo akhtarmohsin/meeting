@@ -1,0 +1,357 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "format:MTG-{#####}",
+ "creation": "2026-10-31 12:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "status",
+  "column_break_hdr",
+  "organizer",
+  "meeting_type",
+  "schedule_section",
+  "start",
+  "column_break_sch",
+  "end",
+  "location_section",
+  "location",
+  "column_break_loc",
+  "video_provider",
+  "video_link",
+  "generate_meet_link",
+  "meet_room",
+  "add_to_calendar",
+  "calendar_event",
+  "calendar_account",
+  "description",
+  "repeat_section",
+  "repeat",
+  "repeat_rule",
+  "column_break_repeat",
+  "repeat_of",
+  "attendees_section",
+  "attendees",
+  "agenda_tab",
+  "agenda",
+  "minutes_tab",
+  "minutes",
+  "decisions",
+  "meta_section",
+  "invites_sent_on",
+  "reminder_sent"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "idx": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "default": "Scheduled",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "idx": 2,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Scheduled\nIn Progress\nCompleted\nCancelled"
+  },
+  {
+   "fieldname": "column_break_hdr",
+   "fieldtype": "Column Break",
+   "idx": 3
+  },
+  {
+   "fieldname": "organizer",
+   "fieldtype": "Link",
+   "idx": 4,
+   "in_standard_filter": 1,
+   "label": "Organizer",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "default": "Online",
+   "fieldname": "meeting_type",
+   "fieldtype": "Select",
+   "idx": 5,
+   "label": "Meeting Type",
+   "options": "Online\nIn Person\nHybrid"
+  },
+  {
+   "fieldname": "schedule_section",
+   "fieldtype": "Section Break",
+   "idx": 6,
+   "label": "Schedule"
+  },
+  {
+   "fieldname": "start",
+   "fieldtype": "Datetime",
+   "idx": 7,
+   "in_list_view": 1,
+   "label": "Start",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_sch",
+   "fieldtype": "Column Break",
+   "idx": 8
+  },
+  {
+   "fieldname": "end",
+   "fieldtype": "Datetime",
+   "idx": 9,
+   "label": "End",
+   "reqd": 1
+  },
+  {
+   "fieldname": "location_section",
+   "fieldtype": "Section Break",
+   "idx": 10,
+   "label": "Location"
+  },
+  {
+   "depends_on": "eval:doc.meeting_type!='Online'",
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "idx": 11,
+   "label": "Location"
+  },
+  {
+   "fieldname": "column_break_loc",
+   "fieldtype": "Column Break",
+   "idx": 12
+  },
+  {
+   "depends_on": "eval:doc.meeting_type!='In Person'",
+   "fieldname": "video_provider",
+   "fieldtype": "Select",
+   "idx": 13,
+   "label": "Video Provider",
+   "options": "\nFrappe Meet\nGoogle Meet\nZoom\nMicrosoft Teams\nJitsi\nOther"
+  },
+  {
+   "depends_on": "eval:doc.meeting_type!='In Person'",
+   "fieldname": "video_link",
+   "fieldtype": "Data",
+   "idx": 14,
+   "label": "Video Link",
+   "options": "URL"
+  },
+  {
+   "depends_on": "eval:doc.meeting_type!='In Person' && doc.video_provider=='Frappe Meet'",
+   "fieldname": "generate_meet_link",
+   "fieldtype": "Button",
+   "idx": 15,
+   "label": "Generate Frappe Meet Link"
+  },
+  {
+   "depends_on": "eval:doc.meet_room",
+   "description": "Frappe Meet room created for this meeting",
+   "fieldname": "meet_room",
+   "fieldtype": "Data",
+   "idx": 16,
+   "label": "Meet Room",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "description": "Keep an event for this meeting in your Frappe Calendar (needs Frappe Suite Calendar)",
+   "fieldname": "add_to_calendar",
+   "fieldtype": "Check",
+   "idx": 17,
+   "label": "Add to Frappe Calendar"
+  },
+  {
+   "fieldname": "calendar_event",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "idx": 18,
+   "label": "Calendar Event",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "calendar_account",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "idx": 19,
+   "label": "Calendar Account",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "idx": 20,
+   "label": "Description"
+  },
+  {
+   "collapsible": 1,
+   "collapsible_depends_on": "eval:doc.repeat || doc.repeat_of",
+   "fieldname": "repeat_section",
+   "fieldtype": "Section Break",
+   "idx": 21,
+   "label": "Repeat"
+  },
+  {
+   "default": "0",
+   "description": "Creates the following occurrences as separate meetings when saved",
+   "fieldname": "repeat",
+   "fieldtype": "Check",
+   "idx": 22,
+   "label": "Repeat",
+   "set_only_once": 1
+  },
+  {
+   "depends_on": "eval:doc.repeat",
+   "description": "Same format as Frappe Calendar: frequency, interval, byDay, byMonthDay, until or count",
+   "fieldname": "repeat_rule",
+   "fieldtype": "JSON",
+   "idx": 23,
+   "label": "Repeat Rule",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "column_break_repeat",
+   "fieldtype": "Column Break",
+   "idx": 24
+  },
+  {
+   "description": "First meeting of the series this one belongs to",
+   "fieldname": "repeat_of",
+   "fieldtype": "Link",
+   "idx": 25,
+   "label": "Repeat Of",
+   "no_copy": 1,
+   "options": "Meeting",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "attendees_section",
+   "fieldtype": "Section Break",
+   "idx": 26,
+   "label": "Attendees"
+  },
+  {
+   "fieldname": "attendees",
+   "fieldtype": "Table",
+   "idx": 27,
+   "label": "Attendees",
+   "options": "Meeting Attendee"
+  },
+  {
+   "fieldname": "agenda_tab",
+   "fieldtype": "Tab Break",
+   "idx": 28,
+   "label": "Agenda"
+  },
+  {
+   "fieldname": "agenda",
+   "fieldtype": "Table",
+   "idx": 29,
+   "label": "Agenda",
+   "options": "Meeting Agenda Item"
+  },
+  {
+   "fieldname": "minutes_tab",
+   "fieldtype": "Tab Break",
+   "idx": 30,
+   "label": "Minutes"
+  },
+  {
+   "fieldname": "minutes",
+   "fieldtype": "Text Editor",
+   "idx": 31,
+   "label": "Minutes"
+  },
+  {
+   "fieldname": "decisions",
+   "fieldtype": "Small Text",
+   "idx": 32,
+   "label": "Decisions"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "meta_section",
+   "fieldtype": "Section Break",
+   "idx": 33,
+   "label": "Notifications"
+  },
+  {
+   "fieldname": "invites_sent_on",
+   "fieldtype": "Datetime",
+   "idx": 34,
+   "label": "Invites Sent On",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "reminder_sent",
+   "fieldtype": "Check",
+   "idx": 35,
+   "label": "Reminder Sent",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-11-03 13:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Meeting",
+ "name": "Meeting",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Meeting Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Meeting User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "title,status,start",
+ "show_title_field_in_link": 1,
+ "sort_field": "start",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

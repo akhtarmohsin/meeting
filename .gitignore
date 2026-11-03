@@ -53,3 +53,8 @@ jspm_packages/
 
 # Aider AI Chat
 .aider*
+
+frontend/node_modules
+meeting/public/frontend
+meeting/www/meeting.html
+.dev_test_user
