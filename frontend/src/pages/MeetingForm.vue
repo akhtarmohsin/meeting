@@ -71,7 +71,13 @@
 		<!-- Attendees and agenda side by side on wide screens, stacked on small ones. -->
 		<div class="grid gap-8 md:grid-cols-2">
 			<section class="min-w-0">
-				<div class="mb-2 flex h-7 items-center text-sm text-ink-gray-6">Attendees</div>
+				<div class="mb-2 flex h-7 items-center justify-between">
+					<span class="text-sm text-ink-gray-6">Attendees</span>
+					<Button size="sm" variant="ghost" :loading="addingAll" @click="addAllAttendees">
+						<template #prefix><Icon name="lucide-users" class="h-4 w-4" /></template>
+						Add all
+					</Button>
+				</div>
 				<UserPicker @select="addAttendee" />
 				<div v-if="form.attendees.length" class="mt-1 flex flex-col divide-y divide-outline-gray-1">
 					<div v-for="(a, i) in form.attendees" :key="a.email" class="flex items-center gap-3 py-2.5">
@@ -143,6 +149,7 @@ const form = reactive(blankMeeting())
 const loaded = ref(!props.name)
 const saving = ref(false)
 const generatingLink = ref(false)
+const addingAll = ref(false)
 const repeatDialog = ref(false)
 const series = ref(null)
 
@@ -195,8 +202,23 @@ async function generateMeetLink() {
 }
 
 function addAttendee(person) {
-	if (form.attendees.some((a) => a.email === person.email)) return
+	if (form.attendees.some((a) => a.email === person.email)) return false
 	form.attendees.push({ ...person, rsvp: "Pending", optional: 0 })
+	return true
+}
+
+// Everyone who can use Meeting, skipping people already on the list.
+async function addAllAttendees() {
+	addingAll.value = true
+	try {
+		const people = await call("meeting.api.meetings.get_meeting_users")
+		const added = people.filter((p) => addAttendee({ user: p.name, email: p.email, full_name: p.full_name })).length
+		toast.success(added ? `Added ${added} ${added === 1 ? "person" : "people"}` : "Everyone is already invited")
+	} catch (e) {
+		toast.error(errorMessage(e))
+	} finally {
+		addingAll.value = false
+	}
 }
 
 async function loadMeeting() {

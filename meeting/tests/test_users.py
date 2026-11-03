@@ -1,6 +1,7 @@
 import frappe
 from frappe.tests import IntegrationTestCase
 
+from meeting.api import meetings as meetings_api
 from meeting.api import users as api
 
 MANAGER = "users-manager@example.com"
@@ -43,6 +44,18 @@ class TestMeetingUsers(IntegrationTestCase):
 		)
 		result = api.create_user("helper@example.com", "Helper", send_welcome_email=False)
 		self.assertTrue(result["created"])
+
+	def test_meeting_users_lists_only_enabled_meeting_people(self):
+		make_user("no.role@example.com")
+		make_user("disabled.member@example.com", "Meeting User")
+		frappe.db.set_value("User", "disabled.member@example.com", "enabled", 0)
+
+		frappe.set_user(MEMBER)  # any Meeting user may ask
+		emails = {u.email for u in meetings_api.get_meeting_users()}
+		self.assertIn(MEMBER, emails)
+		self.assertIn(MANAGER, emails)
+		self.assertNotIn("no.role@example.com", emails)
+		self.assertNotIn("disabled.member@example.com", emails)
 
 	def test_rejects_bad_role_and_email(self):
 		self.assertRaises(frappe.ValidationError, api.create_user, "ok@example.com", "Ok", role="System Manager")

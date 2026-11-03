@@ -151,6 +151,23 @@ def search_users(txt: str = "") -> list[dict]:
 	)
 
 
+@frappe.whitelist()
+def get_meeting_users() -> list[dict]:
+	"""Everyone who can use Meeting, for the attendee picker's "Add all"."""
+	names = frappe.get_all(
+		"Has Role",
+		filters={"role": ["in", ["Meeting User", "Meeting Manager"]], "parenttype": "User"},
+		pluck="parent",
+		distinct=True,
+	)
+	return frappe.get_all(
+		"User",
+		filters={"name": ["in", names or [""]], "enabled": 1},
+		fields=["name", "full_name", "email"],
+		order_by="full_name asc",
+	)
+
+
 def refresh_from_calendar(doc) -> None:
 	"""Show edits made in Frappe Calendar straight away; the scheduled pull catches the rest."""
 	if not doc.calendar_event:
