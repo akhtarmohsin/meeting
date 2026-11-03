@@ -16,7 +16,6 @@
 				</SidebarSection>
 			</div>
 			<div class="p-2">
-				<SidebarItem label="New Meeting" icon="lucide-plus" :route="{ name: 'NewMeeting' }" :active="false" />
 				<SidebarCollapseToggle />
 			</div>
 		</Sidebar>
