@@ -1,6 +1,6 @@
 <template>
-	<Dialog v-model="show" :options="{ title: item?.name ? 'Edit action item' : 'New action item' }">
-		<template #body-content>
+	<Dialog v-model:open="show" :title="item?.name ? 'Edit action item' : 'New action item'">
+		<template #default>
 			<div class="space-y-4">
 				<FormControl v-model="form.title" label="Title" placeholder="Share the revised roadmap" />
 				<div class="grid grid-cols-2 gap-4">

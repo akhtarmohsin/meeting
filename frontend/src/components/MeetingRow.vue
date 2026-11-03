@@ -1,7 +1,7 @@
 <template>
 	<router-link
 		:to="{ name: 'Meeting', params: { name: meeting.name } }"
-		class="-mx-3 flex items-center gap-4 rounded-md px-3 py-3 hover:bg-surface-gray-1"
+		class="-mx-3 flex items-center gap-4 rounded-5 px-3 py-3 hover:bg-surface-gray-1"
 	>
 		<div class="w-20 shrink-0 text-base tabular-nums">
 			<div class="font-medium text-ink-gray-9">{{ formatTime(meeting.start) }}</div>
@@ -10,7 +10,7 @@
 		<div class="min-w-0 flex-1">
 			<div class="flex items-center gap-2">
 				<span
-					class="truncate text-base font-medium"
+					class="truncate text-base-medium"
 					:class="meeting.status === 'Cancelled' ? 'text-ink-gray-5 line-through' : 'text-ink-gray-9'"
 				>
 					{{ meeting.title }}
@@ -22,7 +22,7 @@
 				/>
 			</div>
 			<div class="mt-1 flex items-center gap-1.5 text-sm text-ink-gray-6">
-				<FeatherIcon :name="isOnline ? 'video' : 'map-pin'" class="h-3.5 w-3.5 shrink-0" />
+				<Icon :name="isOnline ? 'lucide-video' : 'lucide-map-pin'" class="h-3.5 w-3.5 shrink-0" />
 				<span class="truncate">{{ where }}</span>
 			</div>
 		</div>
@@ -46,7 +46,7 @@
 
 <script setup>
 import { computed } from "vue"
-import { Avatar, Badge, Button, FeatherIcon } from "frappe-ui"
+import { Avatar, Badge, Button, Icon } from "frappe-ui"
 import { MEETING_STATUS_THEME, formatTime } from "@/utils"
 
 const props = defineProps({

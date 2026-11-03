@@ -5,10 +5,10 @@
 			<div v-for="a in doc.attendees" :key="a.name" class="flex items-center gap-3 py-3">
 				<Avatar :label="a.full_name || a.email" size="md" class="shrink-0" />
 				<div class="min-w-0 flex-1">
-					<div class="flex items-center gap-2 text-base font-medium text-ink-gray-9">
+					<div class="flex items-center gap-2 text-base-medium text-ink-gray-9">
 						<span class="truncate">{{ a.full_name || a.email }}</span>
-						<span v-if="a.user === doc.organizer" class="shrink-0 text-sm font-normal text-ink-gray-6">Organizer</span>
-						<span v-else-if="a.optional" class="shrink-0 text-sm font-normal text-ink-gray-6">Optional</span>
+						<span v-if="a.user === doc.organizer" class="shrink-0 text-sm text-ink-gray-6">Organizer</span>
+						<span v-else-if="a.optional" class="shrink-0 text-sm text-ink-gray-6">Optional</span>
 					</div>
 					<div class="truncate text-sm text-ink-gray-6">{{ a.email }}</div>
 				</div>

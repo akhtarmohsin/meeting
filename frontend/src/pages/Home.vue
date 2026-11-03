@@ -1,14 +1,14 @@
 <template>
 	<header class="page-header">
-		<h1 class="text-lg font-semibold text-ink-gray-9">Home</h1>
+		<h1 class="text-lg-semibold text-ink-gray-9">Home</h1>
 		<Button variant="solid" :route="{ name: 'NewMeeting' }">
-			<template #prefix><FeatherIcon name="plus" class="h-4 w-4" /></template>
+			<template #prefix><Icon name="lucide-plus" class="h-4 w-4" /></template>
 			New meeting
 		</Button>
 	</header>
 	<div class="page flex flex-col gap-10">
 		<div class="flex flex-col gap-1">
-			<h2 class="text-2xl font-semibold leading-tight text-ink-gray-9">{{ greeting }}, {{ firstName }}</h2>
+			<h2 class="text-3xl-semibold leading-tight text-ink-gray-9">{{ greeting }}, {{ firstName }}</h2>
 			<p class="text-base text-ink-gray-6">{{ formatDate(new Date(), "dddd, D MMMM YYYY") }}</p>
 		</div>
 
@@ -25,12 +25,12 @@
 		</div>
 
 		<section>
-			<h3 class="pb-1 text-base font-semibold text-ink-gray-9">Today</h3>
-			<div v-if="dashboard.error" class="text-base text-ink-red-4">{{ errorMessage(dashboard.error) }}</div>
+			<h3 class="pb-1 text-base-semibold text-ink-gray-9">Today</h3>
+			<div v-if="dashboard.error" class="text-base text-ink-red-8">{{ errorMessage(dashboard.error) }}</div>
 			<div v-else-if="dashboard.loading && !data" class="text-base text-ink-gray-5">Loading…</div>
 			<EmptyState
 				v-else-if="!data?.today.length"
-				icon="sun"
+				icon="lucide-sun"
 				title="Nothing scheduled today"
 				action="Schedule a meeting"
 				:to="{ name: 'NewMeeting' }"
@@ -42,11 +42,11 @@
 
 		<section v-if="upcomingLater.length">
 			<div class="flex items-center justify-between pb-1">
-				<h3 class="text-base font-semibold text-ink-gray-9">Coming up</h3>
+				<h3 class="text-base-semibold text-ink-gray-9">Coming up</h3>
 				<Button variant="ghost" :route="{ name: 'Meetings' }">View all</Button>
 			</div>
 			<div v-for="group in groupByDay(upcomingLater)" :key="group.label" class="flex flex-col pt-3">
-				<div class="text-sm font-medium text-ink-gray-6">{{ group.label }}</div>
+				<div class="text-sm-medium text-ink-gray-6">{{ group.label }}</div>
 				<div class="flex flex-col">
 					<MeetingRow v-for="m in group.meetings" :key="m.name" :meeting="m" />
 				</div>
@@ -57,7 +57,7 @@
 
 <script setup>
 import { computed } from "vue"
-import { Button, FeatherIcon, createResource } from "frappe-ui"
+import { Button, Icon, createResource } from "frappe-ui"
 import dayjs from "dayjs"
 import EmptyState from "@/components/EmptyState.vue"
 import MeetingRow from "@/components/MeetingRow.vue"

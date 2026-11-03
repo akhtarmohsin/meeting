@@ -2,11 +2,11 @@
 	<div class="flex flex-col gap-2">
 		<div v-if="canEdit" class="flex justify-end pb-2">
 			<Button @click="edit(null)">
-				<template #prefix><FeatherIcon name="plus" class="h-4 w-4" /></template>
+				<template #prefix><Icon name="lucide-plus" class="h-4 w-4" /></template>
 				Add agenda item
 			</Button>
 		</div>
-		<EmptyState v-if="!doc.agenda.length" icon="list" title="No agenda for this meeting" />
+		<EmptyState v-if="!doc.agenda.length" icon="lucide-list" title="No agenda for this meeting" />
 		<template v-else>
 			<p class="text-sm text-ink-gray-6">
 				{{ discussedCount }} of {{ doc.agenda.length }} discussed · {{ totalMinutes }} min planned
@@ -29,7 +29,7 @@
 					<span class="w-5 shrink-0 text-base tabular-nums text-ink-gray-5">{{ i + 1 }}.</span>
 					<div class="flex min-w-0 flex-1 flex-col gap-1">
 						<span
-							class="text-base font-medium"
+							class="text-base-medium"
 							:class="item.discussed ? 'text-ink-gray-5 line-through' : 'text-ink-gray-9'"
 						>
 							{{ item.topic }}
@@ -59,7 +59,7 @@
 
 <script setup>
 import { computed, ref } from "vue"
-import { Button, Checkbox, FeatherIcon } from "frappe-ui"
+import { Button, Checkbox, Icon } from "frappe-ui"
 import AgendaItemDialog from "@/components/AgendaItemDialog.vue"
 import EmptyState from "@/components/EmptyState.vue"
 

@@ -5,7 +5,7 @@
 				Agenda <span v-if="totalMinutes">· {{ totalMinutes }} min</span>
 			</span>
 			<Button size="sm" variant="ghost" @click="add">
-				<template #prefix><FeatherIcon name="plus" class="h-4 w-4" /></template>
+				<template #prefix><Icon name="lucide-plus" class="h-4 w-4" /></template>
 				Add item
 			</Button>
 		</div>
@@ -21,7 +21,7 @@
 					variant="ghost"
 				/>
 				<Button variant="ghost" size="sm" @click="items.splice(i, 1)">
-					<template #icon><FeatherIcon name="trash-2" class="h-4 w-4" /></template>
+					<template #icon><Icon name="lucide-trash-2" class="h-4 w-4" /></template>
 				</Button>
 			</div>
 		</div>
@@ -31,7 +31,7 @@
 
 <script setup>
 import { computed } from "vue"
-import { Button, FeatherIcon, TextInput } from "frappe-ui"
+import { Button, Icon, TextInput } from "frappe-ui"
 
 const items = defineModel({ type: Array, default: () => [] })
 

@@ -1,17 +1,17 @@
 <template>
 	<header class="page-header">
-		<h1 class="text-lg font-semibold text-ink-gray-9">Action Items</h1>
+		<h1 class="text-lg-semibold text-ink-gray-9">Action Items</h1>
 		<Button variant="solid" @click="list?.edit(null)">
-			<template #prefix><FeatherIcon name="plus" class="h-4 w-4" /></template>
+			<template #prefix><Icon name="lucide-plus" class="h-4 w-4" /></template>
 			New
 		</Button>
 	</header>
 	<div class="page">
 		<div class="mb-5 flex flex-wrap items-center gap-3">
-			<TabButtons v-model="scope" :buttons="scopes" />
+			<TabButtons v-model="scope" :options="scopes" />
 			<FormControl v-model="status" type="select" :options="statuses" class="w-40 sm:ml-auto" />
 		</div>
-		<div v-if="items.error" class="text-base text-ink-red-4">{{ errorMessage(items.error) }}</div>
+		<div v-if="items.error" class="text-base text-ink-red-8">{{ errorMessage(items.error) }}</div>
 		<div v-else-if="items.loading && !items.data" class="text-base text-ink-gray-5">Loading…</div>
 		<ActionItemList
 			v-else
@@ -26,7 +26,7 @@
 
 <script setup>
 import { ref, watch } from "vue"
-import { Button, FeatherIcon, FormControl, TabButtons, createResource } from "frappe-ui"
+import { Button, FormControl, Icon, TabButtons, createResource } from "frappe-ui"
 import ActionItemList from "@/components/ActionItemList.vue"
 import { errorMessage } from "@/utils"
 

@@ -2,7 +2,7 @@ import dayjs from "dayjs"
 
 export const MEETING_STATUS_THEME = {
 	Scheduled: "blue",
-	"In Progress": "orange",
+	"In Progress": "amber",
 	Completed: "green",
 	Cancelled: "gray",
 }
@@ -10,13 +10,13 @@ export const MEETING_STATUS_THEME = {
 export const RSVP_THEME = {
 	Accepted: "green",
 	Declined: "red",
-	Tentative: "orange",
+	Tentative: "amber",
 	Pending: "gray",
 }
 
 export const ACTION_STATUS_THEME = {
 	Open: "blue",
-	"In Progress": "orange",
+	"In Progress": "amber",
 	Done: "green",
 	Cancelled: "gray",
 }
@@ -57,11 +57,6 @@ export function groupByDay(meetings) {
 
 export function isOverdue(item) {
 	return item.due_date && !["Done", "Cancelled"].includes(item.status) && dayjs(item.due_date).isBefore(dayjs(), "day")
-}
-
-// Frappe stores "YYYY-MM-DD HH:mm:ss"; <input type="datetime-local"> wants "YYYY-MM-DDTHH:mm".
-export function toInputDatetime(value) {
-	return value ? dayjs(value).format("YYYY-MM-DDTHH:mm") : ""
 }
 
 export function fromInputDatetime(value) {

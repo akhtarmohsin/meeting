@@ -1,6 +1,6 @@
 <template>
 	<header class="page-header">
-		<h1 class="text-lg font-semibold text-ink-gray-9">{{ name ? "Edit meeting" : "New meeting" }}</h1>
+		<h1 class="text-lg-semibold text-ink-gray-9">{{ name ? "Edit meeting" : "New meeting" }}</h1>
 		<div class="flex gap-2">
 			<Button @click="router.back()">Cancel</Button>
 			<Button variant="solid" :loading="saving" @click="save">Save</Button>
@@ -10,8 +10,8 @@
 		<FormControl v-model="form.title" label="Title" placeholder="Weekly product sync" autofocus />
 
 		<div class="grid gap-4 sm:grid-cols-2 md:gap-x-8">
-			<FormControl v-model="start" type="datetime-local" label="Starts" />
-			<FormControl v-model="end" type="datetime-local" label="Ends" />
+			<DateTimeInput v-model="start" label="Starts" />
+			<DateTimeInput v-model="end" label="Ends" />
 		</div>
 		<!-- Repeat is set when the meeting is created; later it only describes the series. -->
 		<div v-if="!name" class="-mt-2 flex items-center gap-3">
@@ -19,7 +19,7 @@
 			<Button v-if="form.repeat" variant="ghost" size="sm" @click="repeatDialog = true">Edit</Button>
 		</div>
 		<div v-else-if="series" class="-mt-2 flex items-center gap-2 text-base text-ink-gray-7">
-			<FeatherIcon name="repeat" class="h-4 w-4 shrink-0 text-ink-gray-5" />
+			<Icon name="lucide-repeat" class="h-4 w-4 shrink-0 text-ink-gray-5" />
 			{{ series.message }} · meeting {{ series.index }} of {{ series.total }}
 		</div>
 		<RepeatDialog v-model="repeatDialog" :start="form.start" :value="form.repeat_rule" @update="setRepeatRule" />
@@ -40,7 +40,7 @@
 				</template>
 				<div v-if="showMeetButton" class="flex items-center gap-3">
 					<Button :loading="generatingLink" @click="generateMeetLink">
-						<template #prefix><FeatherIcon name="video" class="h-4 w-4" /></template>
+						<template #prefix><Icon name="lucide-video" class="h-4 w-4" /></template>
 						{{ form.meet_room ? "Generate new Frappe Meet link" : "Generate Frappe Meet link" }}
 					</Button>
 					<span v-if="form.meet_room" class="truncate text-sm text-ink-gray-6">Room {{ form.meet_room }}</span>
@@ -49,9 +49,9 @@
 			<div class="flex min-w-0 flex-col gap-4">
 				<div
 					v-if="session.frappeCalendarAvailable"
-					class="flex items-center gap-3 rounded-lg border border-outline-gray-2 px-3 py-2.5"
+					class="flex items-center gap-3 rounded-6 border border-outline-gray-2 px-3 py-2.5"
 				>
-					<FeatherIcon name="calendar" class="h-4 w-4 shrink-0 text-ink-gray-6" />
+					<Icon name="lucide-calendar" class="h-4 w-4 shrink-0 text-ink-gray-6" />
 					<span class="flex-1 text-base text-ink-gray-8">Add to Frappe Calendar</span>
 					<Switch
 						:model-value="Boolean(form.add_to_calendar)"
@@ -98,7 +98,7 @@
 								:aria-label="`Remove ${a.full_name || a.email}`"
 								@click="form.attendees.splice(i, 1)"
 							>
-								<template #icon><FeatherIcon name="x" class="h-4 w-4" /></template>
+								<template #icon><Icon name="lucide-x" class="h-4 w-4" /></template>
 							</Button>
 						</div>
 					</div>
@@ -117,19 +117,20 @@
 import { computed, reactive, ref } from "vue"
 import { useRouter } from "vue-router"
 import dayjs from "dayjs"
-import { Avatar, Button, Checkbox, ErrorMessage, FeatherIcon, FormControl, Switch, call, toast } from "frappe-ui"
+import { Avatar, Button, Checkbox, ErrorMessage, FormControl, Icon, Switch, call, toast } from "frappe-ui"
 import AgendaEditor from "@/components/AgendaEditor.vue"
+import DateTimeInput from "@/components/DateTimeInput.vue"
 import RepeatDialog from "@/components/RepeatDialog.vue"
 import UserPicker from "@/components/UserPicker.vue"
 import { session } from "@/data/session"
-import { errorMessage, fromInputDatetime, repeatMessage, toInputDatetime } from "@/utils"
+import { errorMessage, fromInputDatetime, repeatMessage } from "@/utils"
 
 const props = defineProps({ name: String })
 const router = useRouter()
 
 const meetingTypes = ["Online", "In Person", "Hybrid"]
 const providers = [
-	"",
+	{ label: "None", value: "" },
 	...(session.frappeMeetAvailable ? ["Frappe Meet"] : []),
 	"Google Meet",
 	"Zoom",
@@ -162,17 +163,17 @@ const error = ref("")
 if (props.name) loadMeeting()
 
 const start = computed({
-	get: () => toInputDatetime(form.start),
+	get: () => form.start,
 	set: (v) => {
 		// Keep the meeting length when the start moves.
 		const length = dayjs(form.end).diff(dayjs(form.start), "minute") || 30
-		form.start = fromInputDatetime(v)
+		form.start = v
 		form.end = fromInputDatetime(dayjs(v).add(length, "minute"))
 	},
 })
 const end = computed({
-	get: () => toInputDatetime(form.end),
-	set: (v) => (form.end = fromInputDatetime(v)),
+	get: () => form.end,
+	set: (v) => (form.end = v),
 })
 
 const showMeetButton = computed(
@@ -213,7 +214,7 @@ async function save() {
 		const name = await call("meeting.api.meetings.save_meeting", { data, name: props.name })
 		if (!props.name && sendInvites.value) {
 			const sent = await call("meeting.api.meetings.send_invites", { name })
-			if (sent) toast({ title: `Invites sent to ${sent} attendee${sent > 1 ? "s" : ""}`, icon: "mail" })
+			if (sent) toast.success(`Invites sent to ${sent} attendee${sent > 1 ? "s" : ""}`)
 		}
 		router.replace({ name: "Meeting", params: { name } })
 	} catch (e) {

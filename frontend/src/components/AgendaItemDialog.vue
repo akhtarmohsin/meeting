@@ -1,6 +1,6 @@
 <template>
-	<Dialog v-model="show" :options="{ title: item ? 'Edit agenda item' : 'New agenda item' }">
-		<template #body-content>
+	<Dialog v-model:open="show" :title="item ? 'Edit agenda item' : 'New agenda item'">
+		<template #default>
 			<div class="flex flex-col gap-4">
 				<FormControl v-model="form.topic" label="Topic" placeholder="Review Q4 hiring plan" />
 				<div class="grid grid-cols-2 gap-4">

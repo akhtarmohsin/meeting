@@ -1,12 +1,12 @@
 <template>
-	<Dialog v-model="show" :options="{ title: 'Repeat' }">
-		<template #body-content>
+	<Dialog v-model:open="show" :title="'Repeat'">
+		<template #default>
 			<div class="flex flex-col gap-4">
 				<div class="flex flex-col gap-1.5">
 					<span class="text-sm text-ink-gray-6">Repeat every</span>
 					<div class="flex gap-2.5">
 						<TextInput v-model.number="repeat.interval" type="number" min="1" class="w-16 shrink-0" />
-						<TabButtons v-model="repeat.frequency" :buttons="FREQUENCIES" class="flex-1 [&>div]:w-full [&_button]:flex-1" />
+						<TabButtons v-model="repeat.frequency" :options="FREQUENCIES" fluid class="flex-1" />
 					</div>
 				</div>
 
@@ -20,7 +20,7 @@
 							class="size-8 rounded-full text-sm transition-colors"
 							:class="
 								hasDay(d.value)
-									? 'bg-surface-gray-7 text-ink-white'
+									? 'bg-surface-gray-10 text-ink-base'
 									: 'bg-surface-gray-2 text-ink-gray-8 hover:bg-surface-gray-3'
 							"
 							:aria-pressed="hasDay(d.value)"
@@ -49,7 +49,7 @@
 				</div>
 
 				<div class="flex items-start gap-2.5 border-t border-outline-gray-1 pt-3 text-base text-ink-gray-8">
-					<FeatherIcon name="repeat" class="mt-0.5 h-4 w-4 shrink-0 text-ink-gray-5" />
+					<Icon name="lucide-repeat" class="mt-0.5 h-4 w-4 shrink-0 text-ink-gray-5" />
 					<span class="min-w-0 flex-1 leading-relaxed">{{ repeatMessage(rule) }}</span>
 				</div>
 				<ErrorMessage :message="error" />
@@ -67,7 +67,7 @@
 <script setup>
 import { computed, reactive, ref, watch } from "vue"
 import dayjs from "dayjs"
-import { Button, Dialog, ErrorMessage, FeatherIcon, FormControl, TabButtons, TextInput } from "frappe-ui"
+import { Button, Dialog, ErrorMessage, FormControl, Icon, TabButtons, TextInput } from "frappe-ui"
 import { repeatMessage } from "@/utils"
 
 const show = defineModel({ type: Boolean })

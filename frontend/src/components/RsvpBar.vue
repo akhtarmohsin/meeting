@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-wrap items-center gap-3 rounded-lg bg-surface-gray-2 px-4 py-3">
+	<div class="flex flex-wrap items-center gap-3 rounded-6 bg-surface-gray-2 px-4 py-3">
 		<span class="text-base text-ink-gray-7">
 			{{ value === "Pending" ? "Will you attend?" : `You responded: ${value}` }}
 		</span>

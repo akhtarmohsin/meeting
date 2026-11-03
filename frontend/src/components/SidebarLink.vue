@@ -1,10 +1,10 @@
 <template>
 	<router-link
 		:to="to"
-		class="flex h-8 items-center gap-2 rounded px-2 text-base text-ink-gray-7 hover:bg-surface-gray-2"
-		:class="{ 'bg-surface-selected text-ink-gray-9 shadow-sm': isActive }"
+		class="flex h-8 items-center gap-2 rounded-4 px-2 text-base text-ink-gray-7 hover:bg-surface-gray-2"
+		:class="{ 'bg-surface-elevation-3 text-ink-gray-9 shadow-sm': isActive }"
 	>
-		<FeatherIcon :name="icon" class="h-4 w-4" />
+		<Icon :name="icon" class="h-4 w-4" />
 		{{ label }}
 	</router-link>
 </template>
@@ -12,7 +12,7 @@
 <script setup>
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import { FeatherIcon } from "frappe-ui"
+import { Icon } from "frappe-ui"
 
 const props = defineProps({
 	label: String,

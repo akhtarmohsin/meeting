@@ -7,16 +7,16 @@
 			@blur="closeSoon"
 			@keydown.enter.prevent="pickTyped"
 		>
-			<template #prefix><FeatherIcon name="search" class="h-4 w-4" /></template>
+			<template #prefix><Icon name="lucide-search" class="h-4 w-4" /></template>
 		</TextInput>
 		<div
 			v-if="open && (results.data?.length || isEmail)"
-			class="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border bg-surface-white p-1 shadow-lg"
+			class="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-6 border bg-surface-base p-1 shadow-lg"
 		>
 			<button
 				v-for="u in results.data"
 				:key="u.name"
-				class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left hover:bg-surface-gray-2"
+				class="flex w-full items-center gap-2 rounded-4 px-2 py-1.5 text-left hover:bg-surface-gray-2"
 				@mousedown.prevent="pick(u)"
 			>
 				<Avatar :label="u.full_name" :image="u.user_image" size="sm" />
@@ -27,10 +27,10 @@
 			</button>
 			<button
 				v-if="isEmail"
-				class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-base hover:bg-surface-gray-2"
+				class="flex w-full items-center gap-2 rounded-4 px-2 py-1.5 text-left text-base hover:bg-surface-gray-2"
 				@mousedown.prevent="pickTyped"
 			>
-				<FeatherIcon name="mail" class="h-4 w-4" />
+				<Icon name="lucide-mail" class="h-4 w-4" />
 				Invite {{ query }}
 			</button>
 		</div>
@@ -39,7 +39,7 @@
 
 <script setup>
 import { computed, ref, watch } from "vue"
-import { Avatar, FeatherIcon, TextInput, createResource, debounce } from "frappe-ui"
+import { Avatar, Icon, TextInput, createResource, debounce } from "frappe-ui"
 
 defineProps({ placeholder: { type: String, default: "Add people by name or email" } })
 const emit = defineEmits(["select"])

@@ -7,8 +7,8 @@
 	>
 		<span class="text-sm text-ink-gray-6 group-hover:text-ink-gray-8">{{ label }}</span>
 		<span
-			class="text-2xl font-semibold leading-none tabular-nums"
-			:class="danger ? 'text-ink-red-4' : 'text-ink-gray-9'"
+			class="text-3xl-semibold leading-none tabular-nums"
+			:class="danger ? 'text-ink-red-8' : 'text-ink-gray-9'"
 		>
 			{{ value ?? "–" }}
 		</span>

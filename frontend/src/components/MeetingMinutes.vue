@@ -2,15 +2,23 @@
 	<div class="space-y-4">
 		<div>
 			<div class="mb-2 text-sm text-ink-gray-6">Minutes</div>
-			<TextEditor
-				:content="minutes"
+			<Editor
+				v-model="minutes"
+				:extensions="[RichTextKit]"
 				:editable="canEdit"
-				:fixed-menu="canEdit"
 				placeholder="Capture what was discussed…"
-				editor-class="prose-sm max-w-none min-h-[12rem] px-3 py-2"
-				class="rounded-lg border"
-				@change="(v) => (minutes = v)"
-			/>
+				class="rounded-6 border border-outline-gray-2"
+			>
+				<template #default="{ editor }">
+					<EditorFixedMenu
+						v-if="canEdit"
+						:editor
+						:items="commentToolbar"
+						class="border-b border-outline-gray-2 px-2 py-1"
+					/>
+					<EditorContent :editor class="prose prose-sm min-h-[12rem] max-w-none px-3 py-2" />
+				</template>
+			</Editor>
 		</div>
 		<FormControl
 			v-model="decisions"
@@ -28,7 +36,8 @@
 
 <script setup>
 import { computed, ref } from "vue"
-import { Button, FormControl, TextEditor } from "frappe-ui"
+import { Button, FormControl } from "frappe-ui"
+import { Editor, EditorContent, EditorFixedMenu, RichTextKit, commentToolbar } from "frappe-ui/editor"
 
 const props = defineProps({ doc: Object, canEdit: Boolean, save: Function })
 

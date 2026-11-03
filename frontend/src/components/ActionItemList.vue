@@ -2,16 +2,16 @@
 	<div>
 		<div v-if="meeting" class="flex justify-end pb-2">
 			<Button @click="edit(null)">
-				<template #prefix><FeatherIcon name="plus" class="h-4 w-4" /></template>
+				<template #prefix><Icon name="lucide-plus" class="h-4 w-4" /></template>
 				Add action item
 			</Button>
 		</div>
-		<EmptyState v-if="!items.length" icon="check-square" :title="emptyText" />
+		<EmptyState v-if="!items.length" icon="lucide-square-check-big" :title="emptyText" />
 		<div v-else class="flex flex-col">
 			<div
 				v-for="item in items"
 				:key="item.name"
-				class="-mx-3 flex cursor-pointer items-center gap-3 rounded-md px-3 py-3 hover:bg-surface-gray-1"
+				class="-mx-3 flex cursor-pointer items-center gap-3 rounded-5 px-3 py-3 hover:bg-surface-gray-1"
 				@click="edit(item)"
 			>
 				<Checkbox
@@ -22,7 +22,7 @@
 				/>
 				<div class="min-w-0 flex-1">
 					<div
-						class="truncate text-base font-medium"
+						class="truncate text-base-medium"
 						:class="item.status === 'Done' ? 'text-ink-gray-5 line-through' : 'text-ink-gray-9'"
 					>
 						{{ item.title }}
@@ -37,14 +37,14 @@
 							{{ item.meeting_title || item.meeting }}
 						</router-link>
 						<span v-if="showMeeting && item.meeting && item.due_date">·</span>
-						<span v-if="item.due_date" class="shrink-0" :class="{ 'font-medium text-ink-red-4': isOverdue(item) }">
+						<span v-if="item.due_date" class="shrink-0" :class="{ 'font-medium text-ink-red-8': isOverdue(item) }">
 							{{ isOverdue(item) ? "Overdue" : "Due" }} {{ formatDate(item.due_date, "D MMM") }}
 						</span>
 					</div>
 				</div>
 				<!-- Fixed lanes keep priority, status and assignee aligned across rows. -->
 				<div class="hidden w-12 shrink-0 justify-end sm:flex">
-					<span v-if="item.priority === 'High'" class="text-sm font-medium text-ink-red-4">High</span>
+					<span v-if="item.priority === 'High'" class="text-sm-medium text-ink-red-8">High</span>
 				</div>
 				<div class="flex w-24 shrink-0 justify-end">
 					<Badge :label="item.status" :theme="ACTION_STATUS_THEME[item.status]" />
@@ -60,7 +60,7 @@
 
 <script setup>
 import { ref } from "vue"
-import { Avatar, Badge, Button, Checkbox, FeatherIcon, call } from "frappe-ui"
+import { Avatar, Badge, Button, Checkbox, Icon, call } from "frappe-ui"
 import ActionItemDialog from "@/components/ActionItemDialog.vue"
 import EmptyState from "@/components/EmptyState.vue"
 import { ACTION_STATUS_THEME, formatDate, isOverdue } from "@/utils"
