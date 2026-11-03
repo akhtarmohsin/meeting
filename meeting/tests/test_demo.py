@@ -2,6 +2,7 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.utils import get_datetime
 
+from meeting.api.demo import load_demo
 from meeting.api.meetings import meetings_needing_minutes
 from meeting.demo import MeetingDemo
 
@@ -57,3 +58,27 @@ class TestMeetingDemo(IntegrationTestCase):
 		self.assertFalse(frappe.db.count("Meeting", {"video_provider": "Frappe Meet"}))
 		self.assertFalse(frappe.db.count("Meeting", {"calendar_event": ["is", "set"]}))
 		self.assertTrue(frappe.db.count("Meeting", {"video_provider": "Google Meet"}))
+
+	def test_settings_loads_demo_around_the_current_user(self):
+		me = "demo-loader@example.com"
+		if not frappe.db.exists("User", me):
+			frappe.get_doc(
+				{"doctype": "User", "email": me, "first_name": "Demo", "send_welcome_email": 0}
+			).insert(ignore_permissions=True)
+		user = frappe.get_doc("User", me)
+
+		frappe.set_user(me)
+		self.assertRaises(frappe.PermissionError, load_demo, reset=True)
+
+		frappe.set_user("Administrator")
+		user.add_roles("System Manager")
+		frappe.set_user(me)
+		try:
+			load_demo(reset=True)
+			self.assertEqual(frappe.session.user, me)
+			self.assertEqual([m.title for m in meetings_needing_minutes(me)], ["Vendor Evaluation Call"])
+			feedback = frappe.get_doc("Meeting", {"title": "Customer Feedback Session"})
+			self.assertEqual(feedback.get_attendee(me).rsvp, "Pending")
+		finally:
+			frappe.set_user("Administrator")
+			user.remove_roles("System Manager")
