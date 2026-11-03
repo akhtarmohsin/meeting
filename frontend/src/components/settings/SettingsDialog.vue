@@ -1,6 +1,6 @@
 <template>
 	<!-- frappe-ui's settings dialog, laid out like Frappe Drive's. Meeting keeps Account,
-	     plus Users for managers; workspace and storage settings belong to Suite and Drive. -->
+	     plus Users for managers and Demo data for System Managers; workspace and storage settings belong to Suite and Drive. -->
 	<SettingsDialog v-model:open="open" v-model:tab="tab" size="5xl" :keyboard-shortcut="false">
 		<template #title>Settings</template>
 		<SettingsSidebar>
@@ -33,12 +33,21 @@
 					</template>
 					Users
 				</SettingsNavItem>
+				<SettingsNavItem v-if="session.isSystemManager" value="demo">
+					<template #prefix>
+						<Icon name="lucide-sparkles" class="size-4 shrink-0 text-ink-gray-6" />
+					</template>
+					Demo data
+				</SettingsNavItem>
 			</SettingsNavGroup>
 		</SettingsSidebar>
 		<SettingsContent>
 			<SettingsPanel value="profile"><ProfileSettings /></SettingsPanel>
 			<SettingsPanel value="preferences"><PreferencesSettings /></SettingsPanel>
 			<SettingsPanel v-if="session.isManager" value="users"><UsersSettings /></SettingsPanel>
+			<SettingsPanel v-if="session.isSystemManager" value="demo"
+				><DemoSettings
+			/></SettingsPanel>
 		</SettingsContent>
 	</SettingsDialog>
 </template>
@@ -54,6 +63,7 @@ import {
 	SettingsPanel,
 	SettingsSidebar,
 } from "frappe-ui";
+import DemoSettings from "@/components/settings/DemoSettings.vue";
 import PreferencesSettings from "@/components/settings/PreferencesSettings.vue";
 import ProfileSettings from "@/components/settings/ProfileSettings.vue";
 import UsersSettings from "@/components/settings/UsersSettings.vue";

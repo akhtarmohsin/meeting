@@ -29,7 +29,9 @@ def u(handle: str) -> str:
 
 
 class MeetingDemo:
-	def __init__(self, site_url: str | None = None):
+	def __init__(self, site_url: str | None = None, me: str = ADMIN):
+		# The person the demo is built around: organizer, attendee and owner of action items.
+		self.me = me
 		self.site_url = (site_url or get_url()).rstrip("/")
 		self.today = getdate()
 		self.now = now_datetime().replace(second=0, microsecond=0)
@@ -103,7 +105,7 @@ class MeetingDemo:
 			"Vendor Evaluation Call",
 			self.at(self.past_weekday(1), "16:00"),
 			minutes=45,
-			people=[ADMIN, u("karthik.nair"), u("meera.krishnan")],
+			people=[self.me, u("karthik.nair"), u("meera.krishnan")],
 			status="Completed",
 			meeting_type="Online",
 			video_provider="Google Meet",
@@ -128,7 +130,7 @@ class MeetingDemo:
 			"Hiring Sync",
 			self.now.replace(minute=self.now.minute // 15 * 15),
 			minutes=45,
-			people=[ADMIN, u("meera.krishnan"), u("ananya.iyer")],
+			people=[self.me, u("meera.krishnan"), u("ananya.iyer")],
 			status="In Progress",
 			meeting_type="Online",
 			agenda=[
@@ -141,7 +143,7 @@ class MeetingDemo:
 			"Marketing Campaign Kickoff",
 			kickoff,
 			minutes=60,
-			people=[ADMIN, *G["Marketing"]],
+			people=[self.me, *G["Marketing"]],
 			meeting_type="Online",
 			add_to_calendar=int(self.use_calendar),
 			description="Plan the January product launch campaign.",
@@ -162,7 +164,7 @@ class MeetingDemo:
 			"Design Review",
 			self.at(self.next_weekday(1), "11:00"),
 			minutes=60,
-			people=[ADMIN, u("fatima.sheikh"), u("rohan.das"), u("kavya.reddy")],
+			people=[self.me, u("fatima.sheikh"), u("rohan.das"), u("kavya.reddy")],
 			status="Cancelled",
 			meeting_type="Online",
 			video_provider="Google Meet",
@@ -173,14 +175,14 @@ class MeetingDemo:
 		self.feedback_session()
 		self.offsite(G)
 		self.all_hands()
-		self.action("Renew video conferencing licences", None, ADMIN, 6, priority="Low")
+		self.action("Renew video conferencing licences", None, self.me, 6, priority="Low")
 
 	def q4_review(self, G):
 		review = self.meeting(
 			"Q4 Business Review",
 			self.at(self.past_weekday(7), "10:00"),
 			minutes=90,
-			people=[ADMIN, *G["Leadership"], u("priya.sharma")],
+			people=[self.me, *G["Leadership"], u("priya.sharma")],
 			status="Completed",
 			meeting_type="Hybrid",
 			location="Board Room, 4th Floor",
@@ -237,7 +239,7 @@ class MeetingDemo:
 		self.action(
 			"Prepare SMB pricing proposal",
 			review,
-			ADMIN,
+			self.me,
 			-2,
 			priority="High",
 			description="Compare with three competitors and suggest two options.",
@@ -248,7 +250,7 @@ class MeetingDemo:
 			"Sales Pipeline Review",
 			self.at(self.past_weekday(2), "15:00"),
 			minutes=60,
-			people=[ADMIN, *G["Sales Team"]],
+			people=[self.me, *G["Sales Team"]],
 			status="Completed",
 			meeting_type="Online",
 			video_provider="Zoom",
@@ -275,7 +277,7 @@ class MeetingDemo:
 		)
 		self.action("Send revised quote to Northwind", sales, u("sneha.kapoor"), -1, priority="High")
 		self.action("Update December forecast", sales, u("vikram.singh"), 1)
-		self.action("Book executive call with Contoso", sales, ADMIN, 3, status="In Progress")
+		self.action("Book executive call with Contoso", sales, self.me, 3, status="In Progress")
 
 	def standup(self, G):
 		first = next(
@@ -285,7 +287,7 @@ class MeetingDemo:
 			"Engineering Standup",
 			first,
 			minutes=15,
-			people=[ADMIN, *G["Engineering"]],
+			people=[self.me, *G["Engineering"]],
 			meeting_type="Online",
 			add_to_calendar=int(self.use_calendar),
 			repeat=1,
@@ -310,7 +312,7 @@ class MeetingDemo:
 			minutes=60,
 			people=[
 				u("sanjay.gupta"),
-				ADMIN,
+				self.me,
 				u("priya.sharma"),
 				u("sneha.kapoor"),
 				u("kavya.reddy"),
@@ -339,7 +341,7 @@ class MeetingDemo:
 			"Q1 Planning Offsite",
 			self.at(self.next_weekday(5), "10:00"),
 			minutes=7 * 60,
-			people=[ADMIN, *G["Leadership"], u("priya.sharma"), u("arjun.malhotra")],
+			people=[self.me, *G["Leadership"], u("priya.sharma"), u("arjun.malhotra")],
 			optional=[u("priya.sharma"), u("arjun.malhotra")],
 			meeting_type="In Person",
 			location="Lakeview Conference Centre, Bengaluru",
@@ -374,7 +376,7 @@ class MeetingDemo:
 			"All Hands",
 			self.at(self.next_weekday(8), "17:00"),
 			minutes=60,
-			people=[ADMIN, *everyone],
+			people=[self.me, *everyone],
 			meeting_type="Hybrid",
 			location="Cafeteria",
 			video_provider="Jitsi",
@@ -394,7 +396,7 @@ class MeetingDemo:
 		start,
 		minutes,
 		people,
-		organizer=ADMIN,
+		organizer=None,
 		rsvp=None,
 		optional=(),
 		absent=(),
@@ -402,6 +404,7 @@ class MeetingDemo:
 		invites_sent_days_ago=None,
 		**fields,
 	):
+		organizer = organizer or self.me
 		rsvp = rsvp or {}
 		done = fields.get("status") == "Completed"
 

@@ -23,7 +23,7 @@
 		<!-- Repeat is set when the meeting is created; later it only describes the series. -->
 		<div v-if="!name" class="-mt-2 flex items-center gap-3">
 			<Checkbox
-				:model-value="Boolean(form.repeat)"
+				:model-value="repeatChecked"
 				:label="repeatLabel"
 				@update:model-value="onRepeatToggle"
 			/>
@@ -185,7 +185,7 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import dayjs from "dayjs";
 import {
@@ -230,7 +230,14 @@ const series = ref(null);
 
 const repeatLabel = computed(() => (form.repeat ? repeatMessage(form.repeat_rule) : "Repeat"));
 
+// The box ticks while the dialog is open; it only stays ticked if a rule was applied.
+const repeatChecked = ref(false);
+watch(repeatDialog, (open) => {
+	if (!open) repeatChecked.value = Boolean(form.repeat);
+});
+
 function onRepeatToggle(on) {
+	repeatChecked.value = on;
 	if (on) repeatDialog.value = true;
 	else setRepeatRule(null);
 }
