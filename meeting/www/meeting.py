@@ -30,6 +30,7 @@ def get_boot() -> dict:
 		full_name=frappe.utils.get_fullname(user),
 		user_image=frappe.db.get_value("User", user, "user_image"),
 		is_manager=bool({"System Manager", "Meeting Manager"} & set(frappe.get_roles())),
+		is_system_manager="System Manager" in frappe.get_roles(),
 		site_name=frappe.local.site,
 		time_zone=frappe.utils.get_system_timezone(),
 		frappe_meet_available=FrappeMeet.is_available(),

@@ -6,6 +6,7 @@ export const session = reactive({
 	fullName: "",
 	userImage: null,
 	isManager: false,
+	isSystemManager: false,
 	frappeMeetAvailable: false,
 	frappeCalendarAvailable: false,
 
@@ -23,6 +24,7 @@ export const session = reactive({
 		this.fullName = boot.full_name
 		this.userImage = boot.user_image
 		this.isManager = boot.is_manager
+		this.isSystemManager = boot.is_system_manager
 		this.frappeMeetAvailable = boot.frappe_meet_available
 		this.frappeCalendarAvailable = boot.frappe_calendar_available
 	},
