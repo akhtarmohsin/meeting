@@ -57,6 +57,23 @@ class TestMeetingUsers(IntegrationTestCase):
 		self.assertNotIn("no.role@example.com", emails)
 		self.assertNotIn("disabled.member@example.com", emails)
 
+	def test_user_group_search_and_members(self):
+		make_user("group.off@example.com")
+		frappe.db.set_value("User", "group.off@example.com", "enabled", 0)
+		group = frappe.get_doc(
+			{
+				"doctype": "User Group",
+				"__newname": "Meeting Test Group",
+				"user_group_members": [{"user": MEMBER}, {"user": MANAGER}, {"user": "group.off@example.com"}],
+			}
+		).insert(ignore_permissions=True)
+
+		frappe.set_user(MEMBER)
+		found = {g["name"]: g["member_count"] for g in meetings_api.search_user_groups("Test Gro")}
+		self.assertEqual(found.get(group.name), 3)
+		emails = {u.email for u in meetings_api.get_user_group_members(group.name)}
+		self.assertEqual(emails, {MEMBER, MANAGER})  # the disabled member is left out
+
 	def test_rejects_bad_role_and_email(self):
 		self.assertRaises(frappe.ValidationError, api.create_user, "ok@example.com", "Ok", role="System Manager")
 		self.assertRaises(frappe.ValidationError, api.create_user, "not-an-email", "Bad")

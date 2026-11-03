@@ -152,6 +152,38 @@ def search_users(txt: str = "") -> list[dict]:
 
 
 @frappe.whitelist()
+def search_user_groups(txt: str = "") -> list[dict]:
+	"""Frappe User Groups for the attendee picker, with how many people each holds."""
+	groups = frappe.get_all(
+		"User Group", filters={"name": ["like", f"%{txt}%"]}, pluck="name", limit=10, order_by="name asc"
+	)
+	counts = dict(
+		frappe.get_all(
+			"User Group Member",
+			filters={"parenttype": "User Group", "parent": ["in", groups or [""]]},
+			fields=["parent", {"COUNT": "*"}],
+			group_by="parent",
+			as_list=True,
+		)
+	)
+	return [{"name": g, "member_count": counts.get(g, 0)} for g in groups]
+
+
+@frappe.whitelist()
+def get_user_group_members(group: str) -> list[dict]:
+	"""The enabled members of a User Group, ready to add as attendees."""
+	users = frappe.get_all(
+		"User Group Member", filters={"parenttype": "User Group", "parent": group}, pluck="user"
+	)
+	return frappe.get_all(
+		"User",
+		filters={"name": ["in", users or [""]], "enabled": 1},
+		fields=["name", "full_name", "email"],
+		order_by="full_name asc",
+	)
+
+
+@frappe.whitelist()
 def get_meeting_users() -> list[dict]:
 	"""Everyone who can use Meeting, for the attendee picker's "Add all"."""
 	names = frappe.get_all(
