@@ -72,14 +72,20 @@
 		<div class="grid gap-8 md:grid-cols-2">
 			<section class="min-w-0">
 				<div class="mb-2 flex h-7 items-center justify-between">
-					<span class="text-sm text-ink-gray-6">Attendees</span>
+					<span class="text-sm text-ink-gray-6">
+						Attendees<span v-if="form.attendees.length"> · {{ form.attendees.length }}</span>
+					</span>
 					<Button size="sm" variant="ghost" :loading="addingAll" @click="addAllAttendees">
 						<template #prefix><Icon name="lucide-users" class="h-4 w-4" /></template>
 						Add all
 					</Button>
 				</div>
-				<UserPicker @select="addAttendee" />
-				<div v-if="form.attendees.length" class="mt-1 flex flex-col divide-y divide-outline-gray-1">
+				<UserPicker @select="addAttendee" @select-group="addGroupAttendees" />
+				<!-- Fixed height so a large group doesn't push the rest of the form away; scrolls past ~6 people. -->
+				<div
+					v-if="form.attendees.length"
+					class="mt-2 flex max-h-72 flex-col divide-y divide-outline-gray-1 overflow-y-auto rounded-6 border border-outline-gray-2 px-3"
+				>
 					<div v-for="(a, i) in form.attendees" :key="a.email" class="flex items-center gap-3 py-2.5">
 						<Avatar :label="a.full_name || a.email" size="sm" class="shrink-0" />
 						<div class="min-w-0 flex-1">
@@ -211,14 +217,25 @@ function addAttendee(person) {
 async function addAllAttendees() {
 	addingAll.value = true
 	try {
-		const people = await call("meeting.api.meetings.get_meeting_users")
-		const added = people.filter((p) => addAttendee({ user: p.name, email: p.email, full_name: p.full_name })).length
-		toast.success(added ? `Added ${added} ${added === 1 ? "person" : "people"}` : "Everyone is already invited")
+		addPeople(await call("meeting.api.meetings.get_meeting_users"), "")
 	} catch (e) {
 		toast.error(errorMessage(e))
 	} finally {
 		addingAll.value = false
 	}
+}
+
+async function addGroupAttendees(group) {
+	try {
+		addPeople(await call("meeting.api.meetings.get_user_group_members", { group }), ` from ${group}`)
+	} catch (e) {
+		toast.error(errorMessage(e))
+	}
+}
+
+function addPeople(people, source) {
+	const added = people.filter((p) => addAttendee({ user: p.name, email: p.email, full_name: p.full_name })).length
+	toast.success(added ? `Added ${added} ${added === 1 ? "person" : "people"}${source}` : "Everyone is already invited")
 }
 
 async function loadMeeting() {
