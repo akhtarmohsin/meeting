@@ -10,9 +10,7 @@
 				<template #prefix><Icon name="lucide-video" class="h-4 w-4" /></template>
 				Join
 			</Button>
-			<Dropdown v-if="canEdit" :options="actions">
-				<Button><template #icon><Icon name="lucide-ellipsis" class="h-4 w-4" /></template></Button>
-			</Dropdown>
+			<Dropdown v-if="canEdit" :options="actions" :button="{ icon: 'lucide-ellipsis', label: 'Meeting actions' }" />
 		</div>
 	</header>
 
@@ -42,7 +40,7 @@
 
 		<RsvpBar v-if="showRsvp" :value="meeting.data.my_rsvp" :meeting="name" @change="meeting.reload()" />
 
-		<TabButtons v-model="tab" :options="tabs" />
+		<TabButtons v-model="tab" :options="tabs" fluid />
 
 		<MeetingAttendees v-if="tab === 'attendees'" :doc="doc" :can-edit="canEdit" :save="save" />
 		<MeetingAgenda v-else-if="tab === 'agenda'" :doc="doc" :can-edit="canEdit" :save="save" />

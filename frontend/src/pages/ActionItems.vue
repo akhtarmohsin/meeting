@@ -9,7 +9,10 @@
 	<div class="page">
 		<div class="mb-5 flex flex-wrap items-center gap-3">
 			<TabButtons v-model="scope" :options="scopes" />
-			<FormControl v-model="status" type="select" :options="statuses" class="w-40 sm:ml-auto" />
+			<!-- The select fills its container in frappe-ui 1.0, so the width lives on a wrapper. -->
+			<div class="w-40 sm:ml-auto">
+				<FormControl v-model="status" type="select" :options="statuses" />
+			</div>
 		</div>
 		<div v-if="items.error" class="text-base text-ink-red-8">{{ errorMessage(items.error) }}</div>
 		<div v-else-if="items.loading && !items.data" class="text-base text-ink-gray-5">Loading…</div>

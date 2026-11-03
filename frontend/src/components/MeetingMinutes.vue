@@ -2,23 +2,25 @@
 	<div class="space-y-4">
 		<div>
 			<div class="mb-2 text-sm text-ink-gray-6">Minutes</div>
-			<Editor
-				v-model="minutes"
-				:extensions="[RichTextKit]"
-				:editable="canEdit"
-				placeholder="Capture what was discussed…"
-				class="rounded-6 border border-outline-gray-2"
-			>
-				<template #default="{ editor }">
-					<EditorFixedMenu
-						v-if="canEdit"
-						:editor
-						:items="commentToolbar"
-						class="border-b border-outline-gray-2 px-2 py-1"
-					/>
-					<EditorContent :editor class="prose prose-sm min-h-[12rem] max-w-none px-3 py-2" />
-				</template>
-			</Editor>
+			<!-- Editor renders no element of its own, so the frame is this wrapper. -->
+			<div class="rounded-6 border border-outline-gray-2">
+				<Editor
+					v-model="minutes"
+					:extensions="[RichTextKit]"
+					:editable="canEdit"
+					placeholder="Capture what was discussed…"
+				>
+					<template #default="{ editor }">
+						<EditorFixedMenu
+							v-if="canEdit"
+							:editor
+							:items="commentToolbar"
+							class="border-b border-outline-gray-2 px-2 py-1"
+						/>
+						<EditorContent :editor class="prose prose-sm min-h-[12rem] max-w-none px-3 py-2" />
+					</template>
+				</Editor>
+			</div>
 		</div>
 		<FormControl
 			v-model="decisions"

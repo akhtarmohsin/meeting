@@ -61,6 +61,10 @@ const assigneeOptions = computed(() => {
 	const options = people
 		.filter((p) => p.user || p.name)
 		.map((p) => ({ label: p.full_name || p.email, value: p.user || p.name }))
+	// The default assignee is you, who the user search leaves out when you're Administrator.
+	if (!options.some((o) => o.value === session.user)) {
+		options.unshift({ label: session.fullName || session.user, value: session.user })
+	}
 	return [{ label: "Unassigned", value: "" }, ...options]
 })
 

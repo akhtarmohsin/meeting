@@ -38,7 +38,7 @@
 							{{ item.notes }}
 						</span>
 					</div>
-					<div class="flex w-40 shrink-0 flex-col items-end gap-1 text-right text-sm text-ink-gray-6">
+					<div class="flex w-52 shrink-0 flex-col items-end gap-1 text-right text-sm text-ink-gray-6">
 						<span class="tabular-nums">{{ item.duration ? `${item.duration} min` : "" }}</span>
 						<span v-if="item.presenter" class="max-w-full truncate">
 							Presented by {{ presenterName(item.presenter) }}
