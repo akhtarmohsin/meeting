@@ -309,7 +309,7 @@ require_type_annotated_api_methods = True
 add_to_apps_screen = [
 	{
 		"name": "meeting",
-		"logo": "/assets/meeting/images/logo.svg",
+		"logo": "/assets/meeting/images/logo.svg?v=4",
 		"title": "Meeting",
 		"route": "/meeting",
 		"has_permission": "meeting.permissions.has_app_permission",

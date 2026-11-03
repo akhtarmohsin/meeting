@@ -64,7 +64,7 @@ import {
 import SettingsDialog from "@/components/settings/SettingsDialog.vue"
 import { session } from "@/data/session"
 
-const logo = "/assets/meeting/images/logo.svg"
+const logo = "/assets/meeting/images/logo.svg?v=4"
 const DOCS_URL = "https://docs.frappe.io"
 const SUPPORT_URL = "https://discuss.frappe.io"
 
