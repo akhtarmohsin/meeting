@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-import { Icon } from "frappe-ui"
+import { Icon } from "frappe-ui";
 
-defineProps({ icon: String })
+defineProps({ icon: String });
 </script>

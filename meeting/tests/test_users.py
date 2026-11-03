@@ -64,7 +64,11 @@ class TestMeetingUsers(IntegrationTestCase):
 			{
 				"doctype": "User Group",
 				"__newname": "Meeting Test Group",
-				"user_group_members": [{"user": MEMBER}, {"user": MANAGER}, {"user": "group.off@example.com"}],
+				"user_group_members": [
+					{"user": MEMBER},
+					{"user": MANAGER},
+					{"user": "group.off@example.com"},
+				],
 			}
 		).insert(ignore_permissions=True)
 
@@ -75,7 +79,9 @@ class TestMeetingUsers(IntegrationTestCase):
 		self.assertEqual(emails, {MEMBER, MANAGER})  # the disabled member is left out
 
 	def test_rejects_bad_role_and_email(self):
-		self.assertRaises(frappe.ValidationError, api.create_user, "ok@example.com", "Ok", role="System Manager")
+		self.assertRaises(
+			frappe.ValidationError, api.create_user, "ok@example.com", "Ok", role="System Manager"
+		)
 		self.assertRaises(frappe.ValidationError, api.create_user, "not-an-email", "Bad")
 
 

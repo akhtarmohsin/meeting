@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router"
+import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
 	{
@@ -6,8 +6,16 @@ const routes = [
 		component: () => import("@/components/AppLayout.vue"),
 		children: [
 			{ path: "", name: "Home", component: () => import("@/pages/Home.vue") },
-			{ path: "meetings", name: "Meetings", component: () => import("@/pages/Meetings.vue") },
-			{ path: "meetings/new", name: "NewMeeting", component: () => import("@/pages/MeetingForm.vue") },
+			{
+				path: "meetings",
+				name: "Meetings",
+				component: () => import("@/pages/Meetings.vue"),
+			},
+			{
+				path: "meetings/new",
+				name: "NewMeeting",
+				component: () => import("@/pages/MeetingForm.vue"),
+			},
 			{
 				path: "meetings/:name",
 				name: "Meeting",
@@ -20,13 +28,17 @@ const routes = [
 				component: () => import("@/pages/MeetingForm.vue"),
 				props: true,
 			},
-			{ path: "action-items", name: "ActionItems", component: () => import("@/pages/ActionItems.vue") },
+			{
+				path: "action-items",
+				name: "ActionItems",
+				component: () => import("@/pages/ActionItems.vue"),
+			},
 		],
 	},
 	{ path: "/:pathMatch(.*)*", redirect: "/meeting" },
-]
+];
 
 export default createRouter({
 	history: createWebHistory(),
 	routes,
-})
+});

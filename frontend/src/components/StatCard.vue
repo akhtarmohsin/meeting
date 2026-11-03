@@ -3,7 +3,7 @@
 		:is="to ? 'router-link' : 'div'"
 		:to="to"
 		class="flex flex-col gap-1.5 py-1 sm:px-6 sm:first:pl-0"
-		:class="{ 'group': to }"
+		:class="{ group: to }"
 	>
 		<span class="text-sm text-ink-gray-6 group-hover:text-ink-gray-8">{{ label }}</span>
 		<span
@@ -21,5 +21,5 @@ defineProps({
 	value: Number,
 	danger: Boolean,
 	to: Object,
-})
+});
 </script>

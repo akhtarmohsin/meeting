@@ -25,7 +25,9 @@ class FrappeMeet:
 
 	def check_access(self):
 		if not self.is_available():
-			frappe.throw(_("Frappe Meet is not available. Install the Frappe Suite app on this site to use it."))
+			frappe.throw(
+				_("Frappe Meet is not available. Install the Frappe Suite app on this site to use it.")
+			)
 		if not frappe.has_permission("Meet Room", "create"):
 			frappe.throw(
 				_("You need the Suite User role to create Frappe Meet rooms."), frappe.PermissionError

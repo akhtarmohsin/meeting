@@ -1,4 +1,4 @@
-from datetime import timezone
+from datetime import UTC
 from zoneinfo import ZoneInfo
 
 import frappe
@@ -120,7 +120,7 @@ def send_upcoming_reminders():
 
 def to_ics_utc(value) -> str:
 	local = get_datetime(value).replace(tzinfo=ZoneInfo(get_system_timezone()))
-	return local.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+	return local.astimezone(UTC).strftime("%Y%m%dT%H%M%SZ")
 
 
 def ics_escape(text: str) -> str:

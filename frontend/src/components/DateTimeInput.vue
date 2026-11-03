@@ -25,22 +25,28 @@
 </template>
 
 <script setup>
-import { computed } from "vue"
-import dayjs from "dayjs"
-import { FormControl } from "frappe-ui"
+import { computed } from "vue";
+import dayjs from "dayjs";
+import { FormControl } from "frappe-ui";
 
 // Frappe's "YYYY-MM-DD HH:mm:ss".
-const props = defineProps({ modelValue: String, label: String })
-const emit = defineEmits(["update:modelValue"])
+const props = defineProps({ modelValue: String, label: String });
+const emit = defineEmits(["update:modelValue"]);
 
-const date = computed(() => (props.modelValue ? dayjs(props.modelValue).format("YYYY-MM-DD") : ""))
-const time = computed(() => (props.modelValue ? dayjs(props.modelValue).format("HH:mm") : ""))
+const date = computed(() =>
+	props.modelValue ? dayjs(props.modelValue).format("YYYY-MM-DD") : ""
+);
+const time = computed(() => (props.modelValue ? dayjs(props.modelValue).format("HH:mm") : ""));
 
 function setDate(value) {
-	if (value) emit("update:modelValue", `${value} ${time.value || "09:00"}:00`)
+	if (value) emit("update:modelValue", `${value} ${time.value || "09:00"}:00`);
 }
 
 function setTime(value) {
-	if (value) emit("update:modelValue", `${date.value || dayjs().format("YYYY-MM-DD")} ${value.slice(0, 5)}:00`)
+	if (value)
+		emit(
+			"update:modelValue",
+			`${date.value || dayjs().format("YYYY-MM-DD")} ${value.slice(0, 5)}:00`
+		);
 }
 </script>

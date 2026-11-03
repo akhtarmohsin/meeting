@@ -10,13 +10,13 @@
 </template>
 
 <script setup>
-import { Button, Icon } from "frappe-ui"
+import { Button, Icon } from "frappe-ui";
 
 defineProps({
 	icon: { type: String, default: "lucide-inbox" },
 	title: String,
 	action: String,
 	to: Object,
-})
-defineEmits(["action"])
+});
+defineEmits(["action"]);
 </script>

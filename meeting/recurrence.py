@@ -11,7 +11,15 @@ FREQUENCIES = {
 	"monthly": rrule.MONTHLY,
 	"yearly": rrule.YEARLY,
 }
-WEEKDAYS = {"mo": rrule.MO, "tu": rrule.TU, "we": rrule.WE, "th": rrule.TH, "fr": rrule.FR, "sa": rrule.SA, "su": rrule.SU}
+WEEKDAYS = {
+	"mo": rrule.MO,
+	"tu": rrule.TU,
+	"we": rrule.WE,
+	"th": rrule.TH,
+	"fr": rrule.FR,
+	"sa": rrule.SA,
+	"su": rrule.SU,
+}
 # Copied from the first meeting to every later one. Minutes, decisions and RSVPs stay per meeting.
 COPIED_FIELDS = (
 	"title",
@@ -70,7 +78,7 @@ class MeetingSeries:
 		for start in self.to_rrule(first):
 			if start == first:
 				continue
-			if limit and start > limit or len(starts) >= self.MAX_OCCURRENCES:
+			if (limit and start > limit) or len(starts) >= self.MAX_OCCURRENCES:
 				break
 			starts.append(start)
 		return starts
@@ -83,7 +91,9 @@ class MeetingSeries:
 		length = get_datetime(self.root.end) - get_datetime(self.root.start)
 		doc = frappe.new_doc("Meeting")
 		doc.update({field: self.root.get(field) for field in COPIED_FIELDS})
-		doc.update({"start": start, "end": start + length, "status": "Scheduled", "repeat_of": self.root.name})
+		doc.update(
+			{"start": start, "end": start + length, "status": "Scheduled", "repeat_of": self.root.name}
+		)
 		for row in self.root.attendees:
 			is_organizer = row.user == self.root.organizer
 			doc.append(
@@ -99,7 +109,12 @@ class MeetingSeries:
 		for item in self.root.agenda:
 			doc.append(
 				"agenda",
-				{"topic": item.topic, "presenter": item.presenter, "duration": item.duration, "notes": item.notes},
+				{
+					"topic": item.topic,
+					"presenter": item.presenter,
+					"duration": item.duration,
+					"notes": item.notes,
+				},
 			)
 		doc.insert()
 		return doc

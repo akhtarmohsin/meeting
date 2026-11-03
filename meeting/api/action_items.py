@@ -66,6 +66,8 @@ def attach_meeting_titles(items: list[dict]) -> None:
 	names = list({i.meeting for i in items if i.meeting})
 	if not names:
 		return
-	titles = dict(frappe.get_all("Meeting", filters={"name": ["in", names]}, fields=["name", "title"], as_list=True))
+	titles = dict(
+		frappe.get_all("Meeting", filters={"name": ["in", names]}, fields=["name", "title"], as_list=True)
+	)
 	for item in items:
 		item.meeting_title = titles.get(item.meeting)

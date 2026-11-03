@@ -19,27 +19,27 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
-import { Button, call } from "frappe-ui"
-import { RSVP_THEME } from "@/utils"
+import { ref } from "vue";
+import { Button, call } from "frappe-ui";
+import { RSVP_THEME } from "@/utils";
 
-const props = defineProps({ value: String, meeting: String })
-const emit = defineEmits(["change"])
+const props = defineProps({ value: String, meeting: String });
+const emit = defineEmits(["change"]);
 
 const options = [
 	{ label: "Yes", value: "Accepted" },
 	{ label: "Maybe", value: "Tentative" },
 	{ label: "No", value: "Declined" },
-]
-const saving = ref(null)
+];
+const saving = ref(null);
 
 async function respond(response) {
-	saving.value = response
+	saving.value = response;
 	try {
-		await call("meeting.api.meetings.rsvp", { name: props.meeting, response })
-		emit("change")
+		await call("meeting.api.meetings.rsvp", { name: props.meeting, response });
+		emit("change");
 	} finally {
-		saving.value = null
+		saving.value = null;
 	}
 }
 </script>

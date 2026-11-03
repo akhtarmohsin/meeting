@@ -3,7 +3,12 @@ from frappe import _
 from frappe.utils import get_datetime, get_system_timezone, get_url, time_diff_in_seconds
 
 # Meeting RSVP <-> JMAP participationStatus.
-RSVP_TO_STATUS = {"Accepted": "accepted", "Declined": "declined", "Tentative": "tentative", "Pending": "needs-action"}
+RSVP_TO_STATUS = {
+	"Accepted": "accepted",
+	"Declined": "declined",
+	"Tentative": "tentative",
+	"Pending": "needs-action",
+}
 STATUS_TO_RSVP = {status: rsvp for rsvp, status in RSVP_TO_STATUS.items()}
 
 
@@ -25,7 +30,9 @@ class FrappeCalendar:
 		can_use_mail = frappe.get_attr("suite.mail.utils.user.can_use_mail")
 		if not can_use_mail(self.user):
 			return None
-		get_account = frappe.get_attr("suite.mail.doctype.user_account.user_account.get_user_personal_jmap_account")
+		get_account = frappe.get_attr(
+			"suite.mail.doctype.user_account.user_account.get_user_personal_jmap_account"
+		)
 		return get_account(self.user)
 
 	def sync(self, meeting):

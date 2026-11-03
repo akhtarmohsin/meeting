@@ -41,7 +41,9 @@ class CalendarChanges:
 		# Calendar reads are scoped to the account's owner.
 		frappe.set_user(get_user(account))
 		try:
-			events = FrappeCalendar().call("get_calendar_events", account=account, ids=[r.calendar_event for r in rows])
+			events = FrappeCalendar().call(
+				"get_calendar_events", account=account, ids=[r.calendar_event for r in rows]
+			)
 			by_id = {e["id"]: e for e in events}
 			for row in rows:
 				cls(frappe.get_doc("Meeting", row.name)).apply(by_id.get(row.calendar_event))

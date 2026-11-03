@@ -2,7 +2,12 @@
 	<div class="flex h-screen overflow-hidden bg-surface-base">
 		<!-- frappe-ui's sidebar, as Frappe Drive and the other Suite apps use it. -->
 		<Sidebar v-model:collapsed="collapsed" class="hidden sm:flex">
-			<SidebarHeader title="Meeting" :subtitle="session.fullName" :logo="logo" :menu-items="menuItems" />
+			<SidebarHeader
+				title="Meeting"
+				:subtitle="session.fullName"
+				:logo="logo"
+				:menu-items="menuItems"
+			/>
 			<div class="flex-1 overflow-y-auto px-2">
 				<SidebarSection>
 					<SidebarItem
@@ -49,8 +54,8 @@
 </template>
 
 <script setup>
-import { computed, h, ref } from "vue"
-import { useRoute, useRouter } from "vue-router"
+import { computed, h, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import {
 	Icon,
 	Sidebar,
@@ -60,28 +65,28 @@ import {
 	SidebarSection,
 	createResource,
 	useColorScheme,
-} from "frappe-ui"
-import SettingsDialog from "@/components/settings/SettingsDialog.vue"
-import { session } from "@/data/session"
+} from "frappe-ui";
+import SettingsDialog from "@/components/settings/SettingsDialog.vue";
+import { session } from "@/data/session";
 
-const logo = "/assets/meeting/images/logo.svg?v=4"
-const DOCS_URL = "https://docs.frappe.io"
-const SUPPORT_URL = "https://discuss.frappe.io"
+const logo = "/assets/meeting/images/logo.svg?v=4";
+const DOCS_URL = "https://docs.frappe.io";
+const SUPPORT_URL = "https://discuss.frappe.io";
 
-const route = useRoute()
-const router = useRouter()
-const collapsed = ref(false)
-const showSettings = ref(false)
-const { colorScheme, setColorScheme } = useColorScheme()
+const route = useRoute();
+const router = useRouter();
+const collapsed = ref(false);
+const showSettings = ref(false);
+const { colorScheme, setColorScheme } = useColorScheme();
 
 const links = [
 	{ label: "Home", icon: "lucide-house", to: { name: "Home" } },
 	{ label: "Meetings", icon: "lucide-calendar", to: { name: "Meetings" } },
 	{ label: "Action Items", icon: "lucide-square-check-big", to: { name: "ActionItems" } },
-]
+];
 
 // The apps this user can open, from the same list as Frappe's /apps page.
-const apps = createResource({ url: "frappe.apps.get_apps", auto: true })
+const apps = createResource({ url: "frappe.apps.get_apps", auto: true });
 
 // Grouped like Frappe Drive's menu: switching and help first, account last.
 const menuItems = computed(() => [
@@ -90,8 +95,16 @@ const menuItems = computed(() => [
 		hideLabel: true,
 		options: [
 			{ label: "Apps", icon: "lucide-layout-grid", submenu: appItems.value },
-			{ label: "Documentation", icon: "lucide-book", onClick: () => window.open(DOCS_URL, "_blank") },
-			{ label: "Support", icon: "lucide-badge-help", onClick: () => window.open(SUPPORT_URL, "_blank") },
+			{
+				label: "Documentation",
+				icon: "lucide-book",
+				onClick: () => window.open(DOCS_URL, "_blank"),
+			},
+			{
+				label: "Support",
+				icon: "lucide-badge-help",
+				onClick: () => window.open(SUPPORT_URL, "_blank"),
+			},
 			{
 				label: "Theme",
 				icon: "lucide-sun-moon",
@@ -107,11 +120,15 @@ const menuItems = computed(() => [
 		group: "Others",
 		hideLabel: true,
 		options: [
-			{ label: "Settings", icon: "lucide-settings", onClick: () => (showSettings.value = true) },
+			{
+				label: "Settings",
+				icon: "lucide-settings",
+				onClick: () => (showSettings.value = true),
+			},
 			{ label: "Log out", icon: "lucide-log-out", onClick: () => session.logout() },
 		],
 	},
-])
+]);
 
 const appItems = computed(() => {
 	const items = (apps.data || [])
@@ -120,17 +137,24 @@ const appItems = computed(() => {
 			label: app.title,
 			icon: h("img", { src: app.logo, class: "!size-6" }),
 			onClick: () => (window.location.href = app.route),
-		}))
-	return [...items, { label: "Desk", icon: "lucide-monitor", onClick: () => (window.location.href = "/desk") }]
-})
+		}));
+	return [
+		...items,
+		{ label: "Desk", icon: "lucide-monitor", onClick: () => (window.location.href = "/desk") },
+	];
+});
 
 function themeOption(label, scheme, icon) {
 	// A tick marks the active choice, as in Drive.
-	return { label, icon: colorScheme.value === scheme ? "lucide-check" : icon, onClick: () => setColorScheme(scheme) }
+	return {
+		label,
+		icon: colorScheme.value === scheme ? "lucide-check" : icon,
+		onClick: () => setColorScheme(scheme),
+	};
 }
 
 function isActive(link) {
-	const path = router.resolve(link.to).path
-	return path === "/meeting" ? route.path === path : route.path.startsWith(path)
+	const path = router.resolve(link.to).path;
+	return path === "/meeting" ? route.path === path : route.path.startsWith(path);
 }
 </script>

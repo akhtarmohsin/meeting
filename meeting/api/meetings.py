@@ -49,8 +49,11 @@ def get_meetings(view: str = "upcoming", search: str | None = None, limit: int =
 		meetings = find(frappe.session.user, search)
 		attach_attendees(meetings)
 		return meetings
-	filters = {"upcoming": [["end", ">=", now_datetime()], ["status", "!=", "Cancelled"]],
-		"past": [["end", "<", now_datetime()]], "all": []}[view]
+	filters = {
+		"upcoming": [["end", ">=", now_datetime()], ["status", "!=", "Cancelled"]],
+		"past": [["end", "<", now_datetime()]],
+		"all": [],
+	}[view]
 	if search:
 		filters.append(["title", "like", f"%{search}%"])
 	meetings = frappe.get_list(
@@ -223,7 +226,10 @@ def get_series(doc) -> dict | None:
 	if not root_name:
 		return None
 	rule = frappe.parse_json(frappe.db.get_value("Meeting", root_name, "repeat_rule") or "{}")
-	starts = [root_name, *frappe.get_all("Meeting", filters={"repeat_of": root_name}, order_by="start asc", pluck="name")]
+	starts = [
+		root_name,
+		*frappe.get_all("Meeting", filters={"repeat_of": root_name}, order_by="start asc", pluck="name"),
+	]
 	return {
 		"root": root_name,
 		"rule": rule,

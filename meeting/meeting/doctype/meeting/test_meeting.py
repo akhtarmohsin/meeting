@@ -1,7 +1,7 @@
 # Copyright (c) 2026, Mohsin Akhtar and contributors
 # For license information, please see license.txt
 
-from datetime import timedelta, timezone
+from datetime import UTC, timedelta
 from zoneinfo import ZoneInfo
 
 import frappe
@@ -107,7 +107,9 @@ class TestMeeting(IntegrationTestCase):
 	def test_series_ends_on_until_date(self):
 		start = next_weekday(0, hour=9)
 		until = add_to_date(start, days=3).strftime("%Y-%m-%dT23:59:59")
-		root = make_meeting(start=start, repeat=1, repeat_rule={"frequency": "daily", "interval": 1, "until": until})
+		root = make_meeting(
+			start=start, repeat=1, repeat_rule={"frequency": "daily", "interval": 1, "until": until}
+		)
 		self.assertEqual(len(series_of(root)), 3)
 
 	def test_open_ended_series_stops_at_horizon(self):
@@ -119,7 +121,9 @@ class TestMeeting(IntegrationTestCase):
 	def test_series_rule_cannot_change_and_delete_detaches(self):
 		root = make_meeting(repeat=1, repeat_rule={"frequency": "daily", "interval": 1, "count": 3})
 		api.save_meeting({"repeat_rule": {"frequency": "daily", "interval": 1, "count": 9}}, root.name)
-		self.assertEqual(frappe.parse_json(frappe.db.get_value("Meeting", root.name, "repeat_rule"))["count"], 3)
+		self.assertEqual(
+			frappe.parse_json(frappe.db.get_value("Meeting", root.name, "repeat_rule"))["count"], 3
+		)
 
 		names = [o.name for o in series_of(root)]
 		frappe.delete_doc("Meeting", root.name)
@@ -127,12 +131,16 @@ class TestMeeting(IntegrationTestCase):
 			self.assertIsNone(frappe.db.get_value("Meeting", name, "repeat_of"))
 
 	def test_series_invite_has_rrule(self):
-		root = make_meeting(repeat=1, repeat_rule={"frequency": "weekly", "interval": 2, "byDay": [{"day": "tu"}], "count": 5})
+		root = make_meeting(
+			repeat=1, repeat_rule={"frequency": "weekly", "interval": 2, "byDay": [{"day": "tu"}], "count": 5}
+		)
 		self.assertIn("RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=TU;COUNT=5", MeetingInvite(root).ics())
 		self.assertNotIn("RRULE", MeetingInvite(series_of(root)[0]).ics())
 
 	def test_calendar_changes_update_meeting(self):
-		doc = make_meeting(start=next_weekday(2, hour=11), attendees=[{"user": ATTENDEE}, {"email": "guest@example.org"}])
+		doc = make_meeting(
+			start=next_weekday(2, hour=11), attendees=[{"user": ATTENDEE}, {"email": "guest@example.org"}]
+		)
 		start = get_datetime(doc.start)
 		event = {
 			"title": "Renamed in Calendar",
@@ -142,9 +150,18 @@ class TestMeeting(IntegrationTestCase):
 			"duration": "PT1H30M",
 			"organizer": "owner@calendar.test",
 			"participants": [
-				{"email": "owner@calendar.test", "roles": {"owner": True}, "participation_status": "ACCEPTED"},
+				{
+					"email": "owner@calendar.test",
+					"roles": {"owner": True},
+					"participation_status": "ACCEPTED",
+				},
 				{"email": ATTENDEE, "roles": {"attendee": True}, "participation_status": "DECLINED"},
-				{"email": OUTSIDER, "_name": "New Person", "roles": {"attendee": True}, "participation_status": "TENTATIVE"},
+				{
+					"email": OUTSIDER,
+					"_name": "New Person",
+					"roles": {"attendee": True},
+					"participation_status": "TENTATIVE",
+				},
 			],
 		}
 		CalendarChanges(doc).apply(event)
@@ -197,7 +214,11 @@ class TestMeeting(IntegrationTestCase):
 		others = [
 			answered,
 			make_meeting(attendees=[{"user": ATTENDEE}], status="Cancelled"),
-			make_meeting(start=add_to_date(now_datetime(), days=-2), attendees=[{"user": ATTENDEE}], minutes="<p>Done</p>"),
+			make_meeting(
+				start=add_to_date(now_datetime(), days=-2),
+				attendees=[{"user": ATTENDEE}],
+				minutes="<p>Done</p>",
+			),
 			make_meeting(),  # not invited
 		]
 
@@ -253,4 +274,4 @@ def series_of(root):
 def to_utc_local(value) -> str:
 	"""A site-zone datetime written as a UTC local date-time, as a calendar in UTC would send it."""
 	local = value.replace(tzinfo=ZoneInfo(get_system_timezone()))
-	return local.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+	return local.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S")

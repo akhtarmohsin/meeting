@@ -11,7 +11,11 @@
 			<div class="flex items-center gap-2">
 				<span
 					class="truncate text-base-medium"
-					:class="meeting.status === 'Cancelled' ? 'text-ink-gray-5 line-through' : 'text-ink-gray-9'"
+					:class="
+						meeting.status === 'Cancelled'
+							? 'text-ink-gray-5 line-through'
+							: 'text-ink-gray-9'
+					"
 				>
 					{{ meeting.title }}
 				</span>
@@ -22,7 +26,10 @@
 				/>
 			</div>
 			<div class="mt-1 flex items-center gap-1.5 text-sm text-ink-gray-6">
-				<Icon :name="isOnline ? 'lucide-video' : 'lucide-map-pin'" class="h-3.5 w-3.5 shrink-0" />
+				<Icon
+					:name="isOnline ? 'lucide-video' : 'lucide-map-pin'"
+					class="h-3.5 w-3.5 shrink-0"
+				/>
 				<span class="truncate">{{ where }}</span>
 			</div>
 		</div>
@@ -39,30 +46,35 @@
 		</div>
 		<!-- Fixed slot so rows with and without a link keep their columns aligned. -->
 		<div v-if="showJoin" class="flex w-14 shrink-0 justify-end">
-			<Button v-if="meeting.video_link" size="sm" @click.prevent="openLink(meeting.video_link)">Join</Button>
+			<Button
+				v-if="meeting.video_link"
+				size="sm"
+				@click.prevent="openLink(meeting.video_link)"
+				>Join</Button
+			>
 		</div>
 	</router-link>
 </template>
 
 <script setup>
-import { computed } from "vue"
-import { Avatar, Badge, Button, Icon } from "frappe-ui"
-import { MEETING_STATUS_THEME, formatTime } from "@/utils"
+import { computed } from "vue";
+import { Avatar, Badge, Button, Icon } from "frappe-ui";
+import { MEETING_STATUS_THEME, formatTime } from "@/utils";
 
 const props = defineProps({
 	meeting: { type: Object, required: true },
 	showJoin: { type: Boolean, default: false },
-})
+});
 
-const isOnline = computed(() => props.meeting.meeting_type !== "In Person")
+const isOnline = computed(() => props.meeting.meeting_type !== "In Person");
 
 const where = computed(() => {
-	const m = props.meeting
-	if (m.video_link) return m.video_provider || "Online"
-	return m.location || m.meeting_type
-})
+	const m = props.meeting;
+	if (m.video_link) return m.video_provider || "Online";
+	return m.location || m.meeting_type;
+});
 
 function openLink(url) {
-	window.open(url, "_blank", "noopener")
+	window.open(url, "_blank", "noopener");
 }
 </script>

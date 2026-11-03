@@ -1,13 +1,20 @@
 <template>
 	<header class="page-header">
-		<h1 class="text-lg-semibold text-ink-gray-9">{{ name ? "Edit meeting" : "New meeting" }}</h1>
+		<h1 class="text-lg-semibold text-ink-gray-9">
+			{{ name ? "Edit meeting" : "New meeting" }}
+		</h1>
 		<div class="flex gap-2">
 			<Button @click="router.back()">Cancel</Button>
 			<Button variant="solid" :loading="saving" @click="save">Save</Button>
 		</div>
 	</header>
 	<div v-if="loaded" class="page max-w-3xl space-y-6">
-		<FormControl v-model="form.title" label="Title" placeholder="Weekly product sync" autofocus />
+		<FormControl
+			v-model="form.title"
+			label="Title"
+			placeholder="Weekly product sync"
+			autofocus
+		/>
 
 		<div class="grid gap-4 sm:grid-cols-2 md:gap-x-8">
 			<DateTimeInput v-model="start" label="Starts" />
@@ -15,19 +22,35 @@
 		</div>
 		<!-- Repeat is set when the meeting is created; later it only describes the series. -->
 		<div v-if="!name" class="-mt-2 flex items-center gap-3">
-			<Checkbox :model-value="Boolean(form.repeat)" :label="repeatLabel" @update:model-value="onRepeatToggle" />
-			<Button v-if="form.repeat" variant="ghost" size="sm" @click="repeatDialog = true">Edit</Button>
+			<Checkbox
+				:model-value="Boolean(form.repeat)"
+				:label="repeatLabel"
+				@update:model-value="onRepeatToggle"
+			/>
+			<Button v-if="form.repeat" variant="ghost" size="sm" @click="repeatDialog = true"
+				>Edit</Button
+			>
 		</div>
 		<div v-else-if="series" class="-mt-2 flex items-center gap-2 text-base text-ink-gray-7">
 			<Icon name="lucide-repeat" class="h-4 w-4 shrink-0 text-ink-gray-5" />
 			{{ series.message }} · meeting {{ series.index }} of {{ series.total }}
 		</div>
-		<RepeatDialog v-model="repeatDialog" :start="form.start" :value="form.repeat_rule" @update="setRepeatRule" />
+		<RepeatDialog
+			v-model="repeatDialog"
+			:start="form.start"
+			:value="form.repeat_rule"
+			@update="setRepeatRule"
+		/>
 
 		<!-- Where the meeting happens on the left, the description beside it. -->
 		<div class="grid gap-8 md:grid-cols-2">
 			<div class="flex min-w-0 flex-col gap-4">
-				<FormControl v-model="form.meeting_type" type="select" label="Type" :options="meetingTypes" />
+				<FormControl
+					v-model="form.meeting_type"
+					type="select"
+					label="Type"
+					:options="meetingTypes"
+				/>
 				<FormControl
 					v-if="form.meeting_type !== 'Online'"
 					v-model="form.location"
@@ -35,15 +58,30 @@
 					placeholder="Conference room A"
 				/>
 				<template v-if="form.meeting_type !== 'In Person'">
-					<FormControl v-model="form.video_provider" type="select" label="Video" :options="providers" />
-					<FormControl v-model="form.video_link" label="Meeting link" placeholder="https://meet.google.com/..." />
+					<FormControl
+						v-model="form.video_provider"
+						type="select"
+						label="Video"
+						:options="providers"
+					/>
+					<FormControl
+						v-model="form.video_link"
+						label="Meeting link"
+						placeholder="https://meet.google.com/..."
+					/>
 				</template>
 				<div v-if="showMeetButton" class="flex items-center gap-3">
 					<Button :loading="generatingLink" @click="generateMeetLink">
 						<template #prefix><Icon name="lucide-video" class="h-4 w-4" /></template>
-						{{ form.meet_room ? "Generate new Frappe Meet link" : "Generate Frappe Meet link" }}
+						{{
+							form.meet_room
+								? "Generate new Frappe Meet link"
+								: "Generate Frappe Meet link"
+						}}
 					</Button>
-					<span v-if="form.meet_room" class="truncate text-sm text-ink-gray-6">Room {{ form.meet_room }}</span>
+					<span v-if="form.meet_room" class="truncate text-sm text-ink-gray-6"
+						>Room {{ form.meet_room }}</span
+					>
 				</div>
 			</div>
 			<div class="flex min-w-0 flex-col gap-4">
@@ -73,9 +111,16 @@
 			<section class="min-w-0">
 				<div class="mb-2 flex h-7 items-center justify-between">
 					<span class="text-sm text-ink-gray-6">
-						Attendees<span v-if="form.attendees.length"> · {{ form.attendees.length }}</span>
+						Attendees<span v-if="form.attendees.length">
+							· {{ form.attendees.length }}</span
+						>
 					</span>
-					<Button size="sm" variant="ghost" :loading="addingAll" @click="addAllAttendees">
+					<Button
+						size="sm"
+						variant="ghost"
+						:loading="addingAll"
+						@click="addAllAttendees"
+					>
 						<template #prefix><Icon name="lucide-users" class="h-4 w-4" /></template>
 						Add all
 					</Button>
@@ -86,15 +131,25 @@
 					v-if="form.attendees.length"
 					class="mt-2 flex max-h-72 flex-col divide-y divide-outline-gray-1 overflow-y-auto rounded-6 border border-outline-gray-2 px-3"
 				>
-					<div v-for="(a, i) in form.attendees" :key="a.email" class="flex items-center gap-3 py-2.5">
+					<div
+						v-for="(a, i) in form.attendees"
+						:key="a.email"
+						class="flex items-center gap-3 py-2.5"
+					>
 						<Avatar :label="a.full_name || a.email" size="sm" class="shrink-0" />
 						<div class="min-w-0 flex-1">
-							<div class="truncate text-base text-ink-gray-9">{{ a.full_name || a.email }}</div>
-							<div v-if="a.full_name" class="truncate text-sm text-ink-gray-6">{{ a.email }}</div>
+							<div class="truncate text-base text-ink-gray-9">
+								{{ a.full_name || a.email }}
+							</div>
+							<div v-if="a.full_name" class="truncate text-sm text-ink-gray-6">
+								{{ a.email }}
+							</div>
 						</div>
 						<!-- Fixed lanes: role/optional, then remove; the organizer row leaves remove empty. -->
 						<div class="flex w-24 shrink-0 justify-end">
-							<span v-if="a.user === form.organizer" class="text-sm text-ink-gray-6">Organizer</span>
+							<span v-if="a.user === form.organizer" class="text-sm text-ink-gray-6"
+								>Organizer</span
+							>
 							<Checkbox
 								v-else
 								label="Optional"
@@ -120,27 +175,41 @@
 			<AgendaEditor v-model="form.agenda" class="min-w-0" />
 		</div>
 
-		<Checkbox v-if="!name" v-model="sendInvites" label="Email invites to attendees after saving" />
+		<Checkbox
+			v-if="!name"
+			v-model="sendInvites"
+			label="Email invites to attendees after saving"
+		/>
 		<ErrorMessage :message="error" />
 	</div>
 </template>
 
 <script setup>
-import { computed, reactive, ref } from "vue"
-import { useRouter } from "vue-router"
-import dayjs from "dayjs"
-import { Avatar, Button, Checkbox, ErrorMessage, FormControl, Icon, Switch, call, toast } from "frappe-ui"
-import AgendaEditor from "@/components/AgendaEditor.vue"
-import DateTimeInput from "@/components/DateTimeInput.vue"
-import RepeatDialog from "@/components/RepeatDialog.vue"
-import UserPicker from "@/components/UserPicker.vue"
-import { session } from "@/data/session"
-import { errorMessage, fromInputDatetime, repeatMessage } from "@/utils"
+import { computed, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
+import dayjs from "dayjs";
+import {
+	Avatar,
+	Button,
+	Checkbox,
+	ErrorMessage,
+	FormControl,
+	Icon,
+	Switch,
+	call,
+	toast,
+} from "frappe-ui";
+import AgendaEditor from "@/components/AgendaEditor.vue";
+import DateTimeInput from "@/components/DateTimeInput.vue";
+import RepeatDialog from "@/components/RepeatDialog.vue";
+import UserPicker from "@/components/UserPicker.vue";
+import { session } from "@/data/session";
+import { errorMessage, fromInputDatetime, repeatMessage } from "@/utils";
 
-const props = defineProps({ name: String })
-const router = useRouter()
+const props = defineProps({ name: String });
+const router = useRouter();
 
-const meetingTypes = ["Online", "In Person", "Hybrid"]
+const meetingTypes = ["Online", "In Person", "Hybrid"];
 const providers = [
 	{ label: "None", value: "" },
 	...(session.frappeMeetAvailable ? ["Frappe Meet"] : []),
@@ -149,122 +218,144 @@ const providers = [
 	"Microsoft Teams",
 	"Jitsi",
 	"Other",
-]
+];
 
-const form = reactive(blankMeeting())
-const loaded = ref(!props.name)
-const saving = ref(false)
-const generatingLink = ref(false)
-const addingAll = ref(false)
-const repeatDialog = ref(false)
-const series = ref(null)
+const form = reactive(blankMeeting());
+const loaded = ref(!props.name);
+const saving = ref(false);
+const generatingLink = ref(false);
+const addingAll = ref(false);
+const repeatDialog = ref(false);
+const series = ref(null);
 
-const repeatLabel = computed(() => (form.repeat ? repeatMessage(form.repeat_rule) : "Repeat"))
+const repeatLabel = computed(() => (form.repeat ? repeatMessage(form.repeat_rule) : "Repeat"));
 
 function onRepeatToggle(on) {
-	if (on) repeatDialog.value = true
-	else setRepeatRule(null)
+	if (on) repeatDialog.value = true;
+	else setRepeatRule(null);
 }
 
 function setRepeatRule(rule) {
-	form.repeat = rule ? 1 : 0
-	form.repeat_rule = rule
+	form.repeat = rule ? 1 : 0;
+	form.repeat_rule = rule;
 }
-const sendInvites = ref(true)
-const error = ref("")
+const sendInvites = ref(true);
+const error = ref("");
 
-if (props.name) loadMeeting()
+if (props.name) loadMeeting();
 
 const start = computed({
 	get: () => form.start,
 	set: (v) => {
 		// Keep the meeting length when the start moves.
-		const length = dayjs(form.end).diff(dayjs(form.start), "minute") || 30
-		form.start = v
-		form.end = fromInputDatetime(dayjs(v).add(length, "minute"))
+		const length = dayjs(form.end).diff(dayjs(form.start), "minute") || 30;
+		form.start = v;
+		form.end = fromInputDatetime(dayjs(v).add(length, "minute"));
 	},
-})
+});
 const end = computed({
 	get: () => form.end,
 	set: (v) => (form.end = v),
-})
+});
 
 const showMeetButton = computed(
-	() => session.frappeMeetAvailable && form.meeting_type !== "In Person" && form.video_provider === "Frappe Meet",
-)
+	() =>
+		session.frappeMeetAvailable &&
+		form.meeting_type !== "In Person" &&
+		form.video_provider === "Frappe Meet"
+);
 
 async function generateMeetLink() {
-	if (form.video_link && !window.confirm("Replace the current link with a new Frappe Meet link?")) return
-	error.value = ""
-	generatingLink.value = true
+	if (
+		form.video_link &&
+		!window.confirm("Replace the current link with a new Frappe Meet link?")
+	)
+		return;
+	error.value = "";
+	generatingLink.value = true;
 	try {
-		const room = await call("meeting.api.meetings.create_frappe_meet_link", { title: form.title || null })
-		Object.assign(form, room)
+		const room = await call("meeting.api.meetings.create_frappe_meet_link", {
+			title: form.title || null,
+		});
+		Object.assign(form, room);
 	} catch (e) {
-		error.value = errorMessage(e)
+		error.value = errorMessage(e);
 	} finally {
-		generatingLink.value = false
+		generatingLink.value = false;
 	}
 }
 
 function addAttendee(person) {
-	if (form.attendees.some((a) => a.email === person.email)) return false
-	form.attendees.push({ ...person, rsvp: "Pending", optional: 0 })
-	return true
+	if (form.attendees.some((a) => a.email === person.email)) return false;
+	form.attendees.push({ ...person, rsvp: "Pending", optional: 0 });
+	return true;
 }
 
 // Everyone who can use Meeting, skipping people already on the list.
 async function addAllAttendees() {
-	addingAll.value = true
+	addingAll.value = true;
 	try {
-		addPeople(await call("meeting.api.meetings.get_meeting_users"), "")
+		addPeople(await call("meeting.api.meetings.get_meeting_users"), "");
 	} catch (e) {
-		toast.error(errorMessage(e))
+		toast.error(errorMessage(e));
 	} finally {
-		addingAll.value = false
+		addingAll.value = false;
 	}
 }
 
 async function addGroupAttendees(group) {
 	try {
-		addPeople(await call("meeting.api.meetings.get_user_group_members", { group }), ` from ${group}`)
+		addPeople(
+			await call("meeting.api.meetings.get_user_group_members", { group }),
+			` from ${group}`
+		);
 	} catch (e) {
-		toast.error(errorMessage(e))
+		toast.error(errorMessage(e));
 	}
 }
 
 function addPeople(people, source) {
-	const added = people.filter((p) => addAttendee({ user: p.name, email: p.email, full_name: p.full_name })).length
-	toast.success(added ? `Added ${added} ${added === 1 ? "person" : "people"}${source}` : "Everyone is already invited")
+	const added = people.filter((p) =>
+		addAttendee({ user: p.name, email: p.email, full_name: p.full_name })
+	).length;
+	toast.success(
+		added
+			? `Added ${added} ${added === 1 ? "person" : "people"}${source}`
+			: "Everyone is already invited"
+	);
 }
 
 async function loadMeeting() {
-	const { doc, series: info } = await call("meeting.api.meetings.get_meeting", { name: props.name })
-	Object.assign(form, doc)
-	series.value = info
-	loaded.value = true
+	const { doc, series: info } = await call("meeting.api.meetings.get_meeting", {
+		name: props.name,
+	});
+	Object.assign(form, doc);
+	series.value = info;
+	loaded.value = true;
 }
 
 async function save() {
-	error.value = ""
-	saving.value = true
+	error.value = "";
+	saving.value = true;
 	try {
-		const data = { ...form, agenda: form.agenda.filter((a) => a.topic?.trim()) }
-		const name = await call("meeting.api.meetings.save_meeting", { data, name: props.name })
+		const data = { ...form, agenda: form.agenda.filter((a) => a.topic?.trim()) };
+		const name = await call("meeting.api.meetings.save_meeting", { data, name: props.name });
 		if (!props.name && sendInvites.value) {
-			const sent = await call("meeting.api.meetings.send_invites", { name })
-			if (sent) toast.success(`Invites sent to ${sent} attendee${sent > 1 ? "s" : ""}`)
+			const sent = await call("meeting.api.meetings.send_invites", { name });
+			if (sent) toast.success(`Invites sent to ${sent} attendee${sent > 1 ? "s" : ""}`);
 		}
-		router.replace({ name: "Meeting", params: { name } })
+		router.replace({ name: "Meeting", params: { name } });
 	} catch (e) {
-		error.value = errorMessage(e)
+		error.value = errorMessage(e);
 	} finally {
-		saving.value = false
+		saving.value = false;
 	}
 }
 
 function blankMeeting() {
-	const start = dayjs().add(30 - (dayjs().minute() % 30), "minute").second(0)
+	const start = dayjs()
+		.add(30 - (dayjs().minute() % 30), "minute")
+		.second(0);
 	return {
 		title: "",
 		organizer: session.user,
@@ -281,9 +372,15 @@ function blankMeeting() {
 		repeat_rule: null,
 		description: "",
 		attendees: [
-			{ user: session.user, email: session.user, full_name: session.fullName, rsvp: "Accepted", optional: 0 },
+			{
+				user: session.user,
+				email: session.user,
+				full_name: session.fullName,
+				rsvp: "Accepted",
+				optional: 0,
+			},
 		],
 		agenda: [],
-	}
+	};
 }
 </script>

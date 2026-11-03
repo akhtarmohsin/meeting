@@ -7,13 +7,21 @@
 			<SettingsNavGroup label="Account">
 				<SettingsNavItem value="profile">
 					<template #prefix>
-						<Avatar :image="session.userImage" :label="session.fullName" size="xs" class="shrink-0" />
+						<Avatar
+							:image="session.userImage"
+							:label="session.fullName"
+							size="xs"
+							class="shrink-0"
+						/>
 					</template>
 					Profile
 				</SettingsNavItem>
 				<SettingsNavItem value="preferences">
 					<template #prefix>
-						<Icon name="lucide-sliders-horizontal" class="size-4 shrink-0 text-ink-gray-6" />
+						<Icon
+							name="lucide-sliders-horizontal"
+							class="size-4 shrink-0 text-ink-gray-6"
+						/>
 					</template>
 					Preferences
 				</SettingsNavItem>
@@ -45,12 +53,12 @@ import {
 	SettingsNavItem,
 	SettingsPanel,
 	SettingsSidebar,
-} from "frappe-ui"
-import PreferencesSettings from "@/components/settings/PreferencesSettings.vue"
-import ProfileSettings from "@/components/settings/ProfileSettings.vue"
-import UsersSettings from "@/components/settings/UsersSettings.vue"
-import { session } from "@/data/session"
+} from "frappe-ui";
+import PreferencesSettings from "@/components/settings/PreferencesSettings.vue";
+import ProfileSettings from "@/components/settings/ProfileSettings.vue";
+import UsersSettings from "@/components/settings/UsersSettings.vue";
+import { session } from "@/data/session";
 
-const open = defineModel("open", { type: Boolean, default: false })
-const tab = defineModel("tab", { type: String, default: "profile" })
+const open = defineModel("open", { type: Boolean, default: false });
+const tab = defineModel("tab", { type: String, default: "profile" });
 </script>

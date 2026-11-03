@@ -23,7 +23,11 @@
 				<div class="min-w-0 flex-1">
 					<div
 						class="truncate text-base-medium"
-						:class="item.status === 'Done' ? 'text-ink-gray-5 line-through' : 'text-ink-gray-9'"
+						:class="
+							item.status === 'Done'
+								? 'text-ink-gray-5 line-through'
+								: 'text-ink-gray-9'
+						"
 					>
 						{{ item.title }}
 					</div>
@@ -37,14 +41,21 @@
 							{{ item.meeting_title || item.meeting }}
 						</router-link>
 						<span v-if="showMeeting && item.meeting && item.due_date">·</span>
-						<span v-if="item.due_date" class="shrink-0" :class="{ 'font-medium text-ink-red-8': isOverdue(item) }">
-							{{ isOverdue(item) ? "Overdue" : "Due" }} {{ formatDate(item.due_date, "D MMM") }}
+						<span
+							v-if="item.due_date"
+							class="shrink-0"
+							:class="{ 'font-medium text-ink-red-8': isOverdue(item) }"
+						>
+							{{ isOverdue(item) ? "Overdue" : "Due" }}
+							{{ formatDate(item.due_date, "D MMM") }}
 						</span>
 					</div>
 				</div>
 				<!-- Fixed lanes keep priority, status and assignee aligned across rows. -->
 				<div class="hidden w-12 shrink-0 justify-end sm:flex">
-					<span v-if="item.priority === 'High'" class="text-sm-medium text-ink-red-8">High</span>
+					<span v-if="item.priority === 'High'" class="text-sm-medium text-ink-red-8"
+						>High</span
+					>
 				</div>
 				<div class="flex w-24 shrink-0 justify-end">
 					<Badge :label="item.status" :theme="ACTION_STATUS_THEME[item.status]" />
@@ -54,16 +65,22 @@
 				</div>
 			</div>
 		</div>
-		<ActionItemDialog v-model="dialog" :item="selected" :meeting="meeting" :people="people" @saved="$emit('changed')" />
+		<ActionItemDialog
+			v-model="dialog"
+			:item="selected"
+			:meeting="meeting"
+			:people="people"
+			@saved="$emit('changed')"
+		/>
 	</div>
 </template>
 
 <script setup>
-import { ref } from "vue"
-import { Avatar, Badge, Button, Checkbox, Icon, call } from "frappe-ui"
-import ActionItemDialog from "@/components/ActionItemDialog.vue"
-import EmptyState from "@/components/EmptyState.vue"
-import { ACTION_STATUS_THEME, formatDate, isOverdue } from "@/utils"
+import { ref } from "vue";
+import { Avatar, Badge, Button, Checkbox, Icon, call } from "frappe-ui";
+import ActionItemDialog from "@/components/ActionItemDialog.vue";
+import EmptyState from "@/components/EmptyState.vue";
+import { ACTION_STATUS_THEME, formatDate, isOverdue } from "@/utils";
 
 defineProps({
 	items: { type: Array, default: () => [] },
@@ -71,21 +88,24 @@ defineProps({
 	people: { type: Array, default: () => [] },
 	showMeeting: Boolean,
 	emptyText: { type: String, default: "No action items yet" },
-})
-const emit = defineEmits(["changed"])
+});
+const emit = defineEmits(["changed"]);
 
-const dialog = ref(false)
-const selected = ref(null)
+const dialog = ref(false);
+const selected = ref(null);
 
 function edit(item) {
-	selected.value = item
-	dialog.value = true
+	selected.value = item;
+	dialog.value = true;
 }
 
-defineExpose({ edit })
+defineExpose({ edit });
 
 async function toggleDone(item, done) {
-	await call("meeting.api.action_items.set_status", { name: item.name, status: done ? "Done" : "Open" })
-	emit("changed")
+	await call("meeting.api.action_items.set_status", {
+		name: item.name,
+		status: done ? "Done" : "Open",
+	});
+	emit("changed");
 }
 </script>

@@ -22,7 +22,9 @@
 					class="flex w-full items-center gap-2 rounded-4 px-2 py-1.5 text-left hover:bg-surface-gray-2"
 					@mousedown.prevent="pickGroup(g)"
 				>
-					<span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-surface-gray-3">
+					<span
+						class="flex size-5 shrink-0 items-center justify-center rounded-full bg-surface-gray-3"
+					>
 						<Icon name="lucide-users" class="size-3 text-ink-gray-6" />
 					</span>
 					<div class="min-w-0">
@@ -32,7 +34,9 @@
 						</div>
 					</div>
 				</button>
-				<div v-if="results.data?.length" class="px-2 pb-1 pt-2 text-xs text-ink-gray-5">People</div>
+				<div v-if="results.data?.length" class="px-2 pb-1 pt-2 text-xs text-ink-gray-5">
+					People
+				</div>
 			</template>
 			<button
 				v-for="u in results.data"
@@ -59,64 +63,64 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue"
-import { Avatar, Icon, TextInput, createResource, debounce } from "frappe-ui"
+import { computed, ref, watch } from "vue";
+import { Avatar, Icon, TextInput, createResource, debounce } from "frappe-ui";
 
-defineProps({ placeholder: { type: String, default: "Add people by name or email" } })
+defineProps({ placeholder: { type: String, default: "Add people by name or email" } });
 // "select" adds one person; "select-group" hands over a User Group name to add its members.
-const emit = defineEmits(["select", "select-group"])
+const emit = defineEmits(["select", "select-group"]);
 
-const query = ref("")
-const open = ref(false)
+const query = ref("");
+const open = ref(false);
 
 const results = createResource({
 	url: "meeting.api.meetings.search_users",
 	makeParams: () => ({ txt: query.value }),
 	auto: true,
-})
+});
 
 const groups = createResource({
 	url: "meeting.api.meetings.search_user_groups",
 	makeParams: () => ({ txt: query.value }),
 	auto: true,
-})
+});
 
 watch(
 	query,
 	debounce(() => {
-		results.reload()
-		groups.reload()
-	}, 250),
-)
+		results.reload();
+		groups.reload();
+	}, 250)
+);
 
-const isEmail = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(query.value.trim()))
+const isEmail = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(query.value.trim()));
 
 function pick(user) {
-	emit("select", { user: user.name, email: user.email, full_name: user.full_name })
-	done()
+	emit("select", { user: user.name, email: user.email, full_name: user.full_name });
+	done();
 }
 
 function pickGroup(group) {
-	emit("select-group", group.name)
-	done()
+	emit("select-group", group.name);
+	done();
 }
 
 function pickTyped() {
-	const match = results.data?.[0]
-	if (match && !isEmail.value) return pick(match)
+	const match = results.data?.[0];
+	if (match && !isEmail.value) return pick(match);
 	if (isEmail.value) {
-		emit("select", { email: query.value.trim(), full_name: "" })
-		done()
+		emit("select", { email: query.value.trim(), full_name: "" });
+		done();
 	}
 }
 
 // Close the list after a pick so the attendee just added is in view.
 function done() {
-	query.value = ""
-	open.value = false
+	query.value = "";
+	open.value = false;
 }
 
 function closeSoon() {
-	setTimeout(() => (open.value = false), 150)
+	setTimeout(() => (open.value = false), 150);
 }
 </script>

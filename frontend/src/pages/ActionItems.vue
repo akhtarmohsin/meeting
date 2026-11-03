@@ -14,8 +14,12 @@
 				<FormControl v-model="status" type="select" :options="statuses" />
 			</div>
 		</div>
-		<div v-if="items.error" class="text-base text-ink-red-8">{{ errorMessage(items.error) }}</div>
-		<div v-else-if="items.loading && !items.data" class="text-base text-ink-gray-5">Loading…</div>
+		<div v-if="items.error" class="text-base text-ink-red-8">
+			{{ errorMessage(items.error) }}
+		</div>
+		<div v-else-if="items.loading && !items.data" class="text-base text-ink-gray-5">
+			Loading…
+		</div>
 		<ActionItemList
 			v-else
 			ref="list"
@@ -28,30 +32,30 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue"
-import { Button, FormControl, Icon, TabButtons, createResource } from "frappe-ui"
-import ActionItemList from "@/components/ActionItemList.vue"
-import { errorMessage } from "@/utils"
+import { ref, watch } from "vue";
+import { Button, FormControl, Icon, TabButtons, createResource } from "frappe-ui";
+import ActionItemList from "@/components/ActionItemList.vue";
+import { errorMessage } from "@/utils";
 
 const scopes = [
 	{ label: "Assigned to me", value: "mine" },
 	{ label: "All", value: "all" },
-]
+];
 const statuses = [
 	{ label: "Pending", value: "pending" },
 	{ label: "Done", value: "Done" },
 	{ label: "Cancelled", value: "Cancelled" },
 	{ label: "Any status", value: "" },
-]
-const scope = ref("mine")
-const status = ref("pending")
-const list = ref(null)
+];
+const scope = ref("mine");
+const status = ref("pending");
+const list = ref(null);
 
 const items = createResource({
 	url: "meeting.api.action_items.get_action_items",
 	makeParams: () => ({ scope: scope.value, status: status.value || null }),
 	auto: true,
-})
+});
 
-watch([scope, status], () => items.reload())
+watch([scope, status], () => items.reload());
 </script>

@@ -18,7 +18,12 @@
 		>
 			<div v-for="(item, i) in items" :key="i" class="flex items-center gap-2 py-1.5">
 				<span class="w-5 text-sm text-ink-gray-5">{{ i + 1 }}.</span>
-				<TextInput v-model="item.topic" class="flex-1" placeholder="Topic" variant="ghost" />
+				<TextInput
+					v-model="item.topic"
+					class="flex-1"
+					placeholder="Topic"
+					variant="ghost"
+				/>
 				<TextInput
 					v-model.number="item.duration"
 					type="number"
@@ -36,21 +41,23 @@
 </template>
 
 <script setup>
-import { computed, nextTick, ref } from "vue"
-import { Button, Icon, TextInput } from "frappe-ui"
+import { computed, nextTick, ref } from "vue";
+import { Button, Icon, TextInput } from "frappe-ui";
 
-const items = defineModel({ type: Array, default: () => [] })
+const items = defineModel({ type: Array, default: () => [] });
 
-const totalMinutes = computed(() => items.value.reduce((sum, i) => sum + (Number(i.duration) || 0), 0))
+const totalMinutes = computed(() =>
+	items.value.reduce((sum, i) => sum + (Number(i.duration) || 0), 0)
+);
 
-const list = ref(null)
+const list = ref(null);
 
 async function add() {
-	items.value.push({ topic: "", duration: null, discussed: 0 })
+	items.value.push({ topic: "", duration: null, discussed: 0 });
 	// The new row lands at the bottom of a scrolling box: bring it into view and start typing there.
-	await nextTick()
-	if (!list.value) return
-	list.value.scrollTop = list.value.scrollHeight
-	list.value.querySelector(":scope > div:last-child input")?.focus()
+	await nextTick();
+	if (!list.value) return;
+	list.value.scrollTop = list.value.scrollHeight;
+	list.value.querySelector(":scope > div:last-child input")?.focus();
 }
 </script>

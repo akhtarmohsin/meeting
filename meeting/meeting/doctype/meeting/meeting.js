@@ -4,7 +4,9 @@
 frappe.ui.form.on("Meeting", {
 	refresh(frm) {
 		if (frm.doc.video_link) {
-			frm.add_custom_button(__("Join Meeting"), () => window.open(frm.doc.video_link, "_blank"));
+			frm.add_custom_button(__("Join Meeting"), () =>
+				window.open(frm.doc.video_link, "_blank")
+			);
 		}
 	},
 
@@ -26,11 +28,17 @@ frappe.ui.form.on("Meeting", {
 				})
 				.then(({ message }) => {
 					frm.set_value(message);
-					frappe.show_alert({ message: __("Frappe Meet link created"), indicator: "green" });
+					frappe.show_alert({
+						message: __("Frappe Meet link created"),
+						indicator: "green",
+					});
 				});
 
 		if (frm.doc.video_link) {
-			frappe.confirm(__("Replace the current video link with a new Frappe Meet link?"), generate);
+			frappe.confirm(
+				__("Replace the current video link with a new Frappe Meet link?"),
+				generate
+			);
 		} else {
 			generate();
 		}
