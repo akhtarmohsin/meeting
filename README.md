@@ -4,13 +4,25 @@ Schedule meetings, track agendas, minutes and action items
 
 ### Installation
 
-You can install this app using the [bench](https://github.com/frappe/bench) CLI:
+You need a Frappe bench (version 16 or later). Install the app with the [bench](https://github.com/frappe/bench) CLI:
 
 ```bash
 cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch N
-bench install-app meeting
+bench get-app https://github.com/akhtarmohsin/meeting --branch develop
+bench --site $YOUR_SITE install-app meeting
 ```
+
+Then open `/meeting` on your site.
+
+To use Frappe Meet video links and Frappe Calendar, install [Frappe Suite](https://github.com/frappe/suite) on the same site. Meeting works without it.
+
+To try the app with sample data, run:
+
+```bash
+bench --site $YOUR_SITE meeting-demo
+```
+
+System Managers can also load it from **Settings → Demo data**.
 
 ### Contributing
 
@@ -30,4 +42,4 @@ Pre-commit is configured to use the following tools for checking and formatting 
 
 ### License
 
-mit
+MIT. See [license.txt](license.txt).
